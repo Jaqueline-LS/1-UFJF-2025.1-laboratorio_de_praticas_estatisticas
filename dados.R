@@ -1,6 +1,5 @@
 library("dplyr")
 dados_completos <- read.delim2("C:/ufjf/2025.1/laboratorio_de_praticas_estatisticas/Dados/Estatistica.xlsx - Dados Completos.tsv", stringsAsFactors=TRUE)
-View(dados_completos)
 colnames(dados_completos)<-c(
   "numero_pesquisa",
   "idade_1a_crise_meses",
@@ -62,17 +61,18 @@ colnames(dados_completos)<-c(
 analise1<-dados_completos |>
   select(-c(2:14,)) 
 
-str(analise1)
 
-# Isso foi o que foi feito para cada grupo alimentar
-chisq.test(table(analise1$epilepsia, analise1$adeq_porcoes_dia_laticinios), correct = F)
-fisher.test()
+
 
 # A observação com numero de pesquisa 59 esta faltando a idade
 # Na variável adequação por dia laticinios em um dado errado numero de pesquisa 42
      ## Olhando na classificação ele é I de inadequado, mudei na planilha.
+# Mudei no arquivo:
+  #  apaguei um espaço que estava junto com a classificação do n° de pesquisa 53 na variável tipo Focal ou Generalizada
 
 #attach(analise1)
+
+
 
 # Fazer uma análise exploratória dos dados.
 
@@ -82,3 +82,4 @@ fisher.test()
 
 analise2<-dados_completos |>
   filter(epilepsia=="E")
+
