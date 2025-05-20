@@ -181,7 +181,7 @@ normal<-rbind(
 
 fit.4.inicial<-lm(modelo, data=analise2.new)
 summary(fit.4.inicial)
-fit.4<-lm( soma_porcoes_dia_verduras_legumes ~ tdah + di + constipacao + dificuldade_motora + tipo_focal_generalizada + paralisia_cerebral + sexo, data=analise2.new)
+fit.4<-lm(soma_porcoes_dia_verduras_legumes ~ tdah + di + constipacao + dificuldade_motora + tipo_focal_generalizada + paralisia_cerebral + sexo, data=analise2.new)
 summary(fit.4)
 a<-summary(fit.4)
 fit.4<-lm( soma_porcoes_dia_verduras_legumes ~  di + constipacao + dificuldade_motora + tipo_focal_generalizada + paralisia_cerebral + sexo, data=analise2.new)
