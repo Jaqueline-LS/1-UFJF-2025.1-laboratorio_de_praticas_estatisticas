@@ -32,18 +32,19 @@ boxplot(analise1$soma_carnes_ovos~analise1$epilepsia)
 # Retirar as colunas que não serão utilizadas
 analise2.new<-analise2[,-c(c(1,19,20,23,24,27,28,31,32,35,36,39,40,43,44,47,48))]
 str(analise2.new)
-# Transformando em fatores as categóricas
+
+# Transformando em fatores as variáveis categóricas com o número correto de levels
 analise2.new$tea<-factor(as.character(analise2.new$tea), levels=c("N","S"))
 analise2.new$di<-factor(as.character(analise2.new$di), levels=c("N","S"))
 analise2.new$tdah<-factor(as.character(analise2.new$tdah), levels=c("N","S"))
 analise2.new$dificuldade_motora<-factor(as.character(analise2.new$dificuldade_motora), levels=c("N","S"))
 analise2.new$paralisia_cerebral<-factor(as.character(analise2.new$paralisia_cerebral), levels=c("N","S"))
-analise2.new$disfagia<-factor(as.character(analise2.new$disfagia), levels=c("S","N"))
-analise2.new$rec_vomito_diarreia<-factor(as.character(analise2.new$rec_vomito_diarreia), levels=c("S","N"))
-analise2.new$constipacao<-factor(as.character(analise2.new$constipacao), levels=c("S","N"))
-analise2.new$atraso_desenvolvimento_sn<-factor(as.character(analise2.new$constipacao), levels=c("S","N","S*"))
-analise2.new$disfagia<-factor(as.character(analise2.new$disfagia), levels=c("S","N"))
-analise2.new$epilepsia_farmacorressistente<-factor(as.character(analise2.new$epilepsia_farmacorressistente), levels=c("S","N"))
+analise2.new$disfagia<-factor(as.character(analise2.new$disfagia), levels=c("N","S"))
+analise2.new$rec_vomito_diarreia<-factor(as.character(analise2.new$rec_vomito_diarreia), levels=c("N","S"))
+analise2.new$constipacao<-factor(as.character(analise2.new$constipacao), levels=c("N","S"))
+analise2.new$atraso_desenvolvimento_sn<-factor(as.character(analise2.new$constipacao), levels=c("N","S"))
+analise2.new$disfagia<-factor(as.character(analise2.new$disfagia), levels=c("N","S"))
+analise2.new$epilepsia_farmacorressistente<-factor(as.character(analise2.new$epilepsia_farmacorressistente), levels=c("N","S"))
 analise2.new$tipo_focal_generalizada<-factor(as.character(analise2.new$tipo_focal_generalizada), levels=c("F","G"))
 analise2.new$etiologia<-factor(as.character(analise2.new$etiologia), levels=c("E","G","I"))
 
@@ -51,12 +52,25 @@ View(analise2.new)
 str(analise2.new)
 
 
-# Consumo adequado ou inadequado de verduras e legumes
+# Consumo adequado ou inadequado de verduras e legumes # Fazer separado para 13 e 12
+variaveis<-colnames(analise2.new)[c(2:11,15)]
+attach(analise2.new)
+par(mfrow=c(4,4), mar=c(2,1,1,1))
+for(i in seq_along(variaveis))
+{
+  with(analise2.new,
+       boxplot(soma_porcoes_dia_verduras_legumes~get(variaveis[i]), 
+               col=cores, main=paste0(variaveis[i]),
+               ylab="Porções-VerdurasLegumes"))
+  ind<-which(get(variaveis[i])=="S") # Pega as que são "S
+  X<-soma_porcoes_dia_verduras_legumes[ind]
+  Y<-soma_porcoes_dia_verduras_legumes[-ind]
+  stats::mood.test(X,Y)
+  stats::wilcox.test(X,Y) # n e m são menores que 20. Ver o valor tabelado.
 
-boxplot(analise2.new$soma_porcoes_dia_verduras_legumes~analise2.new$tea, col=cores, ylab="Porções por dia de verduras e legumes", xlab="TEA")
+}
+
 ind.tea<-which(analise2.new$tea=="S")
-
-
 X<-analise2.new$soma_porcoes_dia_verduras_legumes[ind.tea]
 Y<-analise2.new$soma_porcoes_dia_verduras_legumes[-ind.tea]
 hist(X)
@@ -107,7 +121,9 @@ qqnorm(fit2$residuals)
 qqline(fit2$residuals)
 
 attach(analise2.new)
-modelo<-soma_porcoes_dia_verduras_legumes~tea+di+constipacao+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+etiologia+idade_atual_anos+sexo
+
+
+modelo<-soma_porcoes_dia_verduras_legumes~tea+tdah+di+constipacao+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
 
 selecaoModeloNormal<-function(dados, modelo, ligacao)
 {
@@ -163,12 +179,17 @@ normal<-rbind(
   ResultadosNormal(analise2.new, modelo, ligacao = "log", tipo ="envel_norm_log"),
   ResultadosNormal(analise2.new, modelo, ligacao = "inverse", tipo ="envel_norm_inverse"))
 
-
-
-fit.4<-lm(soma_porcoes_dia_verduras_legumes ~ di + constipacao + dificuldade_motora + disfagia + sexo , data=analise2.new)
+fit.4.inicial<-lm(modelo, data=analise2.new)
+summary(fit.4.inicial)
+fit.4<-lm( soma_porcoes_dia_verduras_legumes ~ tdah + di + constipacao + dificuldade_motora + tipo_focal_generalizada + paralisia_cerebral + sexo, data=analise2.new)
+summary(fit.4)
 a<-summary(fit.4)
+fit.4<-lm( soma_porcoes_dia_verduras_legumes ~  di + constipacao + dificuldade_motora + tipo_focal_generalizada + paralisia_cerebral + sexo, data=analise2.new)
+a<-summary(fit.4)
+
 tabela<-data.frame(a$coefficients)[-3]
 colnames(tabela)<-c("Estimativa","Erro padrão", "p-valor")
+envelope(fit.4,tipo="envel_norm")
 
 knitr::kable(tabela, caption = "Coeficentes estimados", format = "latex", escape = FALSE, booktabs=T) %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
@@ -187,7 +208,9 @@ res.stu <- r/(si*sqrt(1-h))
 plot(res.stu, pch=19) # Não apresenta nenhum padrão
 
 # Verificar quem é o ponto com alto resíduo
-
+which.max(res.stu)
+analise2.new[26,]
+summary(analise2.new)
 # O modelo foi validado, ele parece atender aos pressupostos de normalidade dos resíduos e de homocedasticidade
 
 #---------- Interpretação

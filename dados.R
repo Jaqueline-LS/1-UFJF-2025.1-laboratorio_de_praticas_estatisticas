@@ -58,13 +58,20 @@ colnames(dados_completos)<-c(
   "adeq_porcoes_dia_doces_salgadinhos_guloseimas"
 )
 
+  
+
 analise1<-dados_completos |>
   select(-c(2:14,)) 
 
 
 
 
-# A observação com numero de pesquisa 59 esta faltando a idade
+# O indivíduo com numero de pesquisa 59 esta faltando a idade
+# O indivíduo com número de pesquisa 34 apresenta na variável atraso no desenvolvimento o valor "S*" isso indica algo ou é erro de digitação
+# considerei erro de digitação, era só um
+dados_completos$atraso_desenvolvimento_sn[which(dados_completos$atraso_desenvolvimento_sn=="S*")]="S"
+
+
 # Na variável adequação por dia laticinios em um dado errado numero de pesquisa 42
      ## Olhando na classificação ele é I de inadequado, mudei na planilha.
 # Mudei no arquivo:
