@@ -8,14 +8,19 @@ library("kableExtra")
 source("C:/ufjf/2024.3/MlG/MLG/Funcoes/envelope.R")
 
 cores<-c("#C9E69E","#FF9B95","#FFC29A","#BAF3DE")
-# Isso foi o que foi feito para cada grupo alimentar
+
+
+
+# Para as variáveis de soma, foram aplicados o teste de Mediana Wilcox.test
+# Verificar se as amsotras atendem aos presupostos
+
+# Isso foi o que foi feito para cada grupo alimentar para as variáveis de adequação
 T2<-chisq.test(table(analise1$epilepsia, analise1$adeq_porcoes_dia_laticinios), correct = F)
 fisher.test(table(analise1$epilepsia,analise1$adeq_porcoes_dia_cereais_saudaveis))
 fisher.test(table(analise1$epilepsia, analise1$adeq_porcoes_dia_laticinios))
 
 boxplot(analise1$idade_atual_anos~analise1$sexo)
 boxplot(analise1$soma_cereais_saudaveis~analise1$epilepsia)
-
 boxplot(analise1$soma_cereais_saudaveis~analise1$epilepsia)
 boxplot(analise1$soma_laticinios~analise1$epilepsia)
 boxplot(analise1$soma_frutas~analise1$epilepsia)
