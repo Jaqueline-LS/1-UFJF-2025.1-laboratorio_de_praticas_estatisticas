@@ -58,16 +58,16 @@ for(i in seq_along(variaveis))
 
 colnames(analise2.new)[c(12,13,15)]
 with(analise2.new,
-       boxplot(soma_porcoes_dia_verduras_legumes~get(colnames(analise2.new)[12]), 
-               col=cores, main=paste0(colnames(analise2.new)[12]),
-               ylab="Porções-VerdurasLegumes"))
+     boxplot(soma_porcoes_dia_verduras_legumes~get(colnames(analise2.new)[12]), 
+             col=cores, main=paste0(colnames(analise2.new)[12]),
+             ylab="Porções-VerdurasLegumes"))
 ind<-which(get(colnames(analise2.new)[12])=="F") # Pega as que são "F"
 X<-soma_porcoes_dia_verduras_legumes[ind]
 Y<-soma_porcoes_dia_verduras_legumes[-ind]
 teste.mood.p[11]<-mood.test(X,Y)$p.value
 teste.wilcox.p[11]<-(wilcox.test(X,Y)$p.value) # n e m são menores que 20. Ver o valor tabelado.
 teste.ansari[11]<-ansari.test(X,Y)$p.value
-  
+
 with(analise2.new,
      boxplot(soma_porcoes_dia_verduras_legumes~get(colnames(analise2.new)[15]), 
              col=cores, main=paste0(colnames(analise2.new)[15]),
@@ -91,9 +91,10 @@ kruskal.test(soma_porcoes_dia_verduras_legumes,etiologia)
 
 # Não deu significativo
 
+kruskal.p<-c(rep(NA,12),kruskal.test(soma_porcoes_dia_verduras_legumes,etiologia)$p.value)
 
 # Resuminho dos testes para as variáveis explicativas em relação a soma de verduras e legumes
-data.frame(variáveis=c(variaveis,colnames(analise2.new)[c(12,15)]), mood=teste.mood.p, wilcox=teste.wilcox.p, ansari=teste.ansari)
+data.frame(variáveis=c(variaveis,colnames(analise2.new)[c(12,15,13)]), mood=c(teste.mood.p,NA), wilcox=c(teste.wilcox.p,NA), ansari=c(teste.ansari,NA), kruskal=kruskal.p)
 
 # Não poderia ter aplicado o teste U da Mann-Whitney para verduras e legumes 
 # Para a comparação entre adequado e farmaco resistente.
@@ -106,7 +107,61 @@ modelo.selecionado<-stepAIC(fit.inicial, trace=1)
 summary(modelo.selecionado)
 
 
-fit.inicial<-lm(modelo,soma_porcoes_dia_verduras_legumes ~ di + tdah + 
-  dificuldade_motora + tipo_focal_generalizada + constipacao + 
-  paralisia_cerebral + sexo, data = analise2.new)
+# Sem tdah
+fit.2<-lm(soma_porcoes_dia_verduras_legumes ~ di  + 
+            dificuldade_motora + tipo_focal_generalizada + constipacao + 
+            paralisia_cerebral + sexo, data = analise2.new)
+summary(fit.2)
+
+# Modelo com as variáveis que tiveram teste de medias significativos
+fit.inicial<-lm(soma_porcoes_dia_verduras_legumes ~ tea + 
+                  dificuldade_motora + constipacao + atraso_desenvolvimento_sn + 
+                  tipo_focal_generalizada +
+                  paralisia_cerebral + sexo, data = analise2.new)
+
+summary(fit.inicial)
+
+# Ao retirar as variáveis não significativas sobra só a dificuldade motora no final
+
+
+
+
+# Analise do modelo selecionado
+
+fit.selecionado<-fit.2
+summary(fit.selecionado)
+
+# Resíduo studentizado
+X <- model.matrix(fit.selecionado)
+n <- nrow(X)
+p <- ncol(X)
+
+H <- X%*%solve(t(X)%*%X)%*%t(X)
+h <- diag(H)
+si <- lm.influence(fit.selecionado)$sigma
+sigma2<-summary(fit.selecionado)$sigma
+r <- resid(fit.selecionado)
+res.press <- r/(si*sqrt(1-h))
+res.stu<- r/sqrt(sigma2*(1-h))
+
+par(mfrow=c(1,1), mar=c(2,2,2,1))
+plot(res.stu, pch=19) # Não apresenta nenhum padrão
+
+which.max(res.stu)
+
+# Quem é a observação 26? 
+analise2.new[26,c(1:15,24)]
+summary(analise2.new[c(1:15,24)])
+h[26]
+
+plot(h)
+which.max(h)
+
+
+analise2.new[23,c(1:15,24)]
+summary(analise2.new[,c(1:15,24)])
+
+
+qqnorm(res.stu)
+
 
