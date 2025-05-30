@@ -7,7 +7,7 @@ library("kableExtra")
 # Funções de MLG
 source("C:/ufjf/2024.3/MlG/MLG/Funcoes/envelope.R")
 
-cores<-c("#C9E69E","#FF9B95","#FFC29A","#BAF3DE")
+cores<-c("#C9E69E","#BAF3DE","#FF9B95","#FFC29A")
 
 
 
@@ -60,13 +60,13 @@ str(analise2.new)
 # Consumo adequado ou inadequado de verduras e legumes # Fazer separado para 13 e 12
 variaveis<-colnames(analise2.new)[c(2:11,15)]
 attach(analise2.new)
-par(mfrow=c(4,4), mar=c(2,1,1,1))
+par(mfrow=c(4,4), mar=c(1.5,1,1,1))
 for(i in seq_along(variaveis))
 {
   with(analise2.new,
        boxplot(soma_porcoes_dia_verduras_legumes~get(variaveis[i]), 
                col=cores, main=paste0(variaveis[i]),
-               ylab="Porções-VerdurasLegumes"))
+               ylab=""))
   ind<-which(get(variaveis[i])=="S") # Pega as que são "S
   X<-soma_porcoes_dia_verduras_legumes[ind]
   Y<-soma_porcoes_dia_verduras_legumes[-ind]
@@ -221,6 +221,94 @@ summary(analise2.new)
 #---------- Interpretação
 # A porção de verduras e legumes consumidos pelos pacientes aumenta em média 1.9192 unidades 
 # para os que apresentam dificuldade motora em relação aos que não apresentam.
+
+
+
+modelo<-soma_porcoes_dia_verduras_legumes~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+fit.inicial<-lm(modelo, data=analise2.new)
+summary(fit.inicial)
+modelo.selecionado<-stepAIC(fit.inicial, trace=1)
+summary(modelo.selecionado)
+
+modelo.selecionado<-stepAIC(fit.inicial, trace=1, direction = c("backward"))
+summary(modelo.selecionado)
+
+
+# Sem tdah
+fit.2<-lm(soma_porcoes_dia_verduras_legumes ~ di  + 
+            dificuldade_motora + tipo_focal_generalizada + constipacao + 
+            paralisia_cerebral + sexo, data = analise2.new)
+summary(fit.2)
+
+# Modelo com as variáveis que tiveram teste de medias significativos
+fit.inicial<-lm(soma_porcoes_dia_verduras_legumes ~ tea + 
+                  dificuldade_motora + constipacao + atraso_desenvolvimento_sn + 
+                  tipo_focal_generalizada +
+                  paralisia_cerebral + sexo, data = analise2.new)
+
+summary(fit.inicial)
+
+# Ao retirar as variáveis não significativas sobra só a dificuldade motora no final
+
+
+# Analise do modelo selecionado
+
+fit.selecionado<-fit.2
+summary(fit.selecionado)
+
+
+
+# Modelo sem a variável paralisia cerebral
+
+fit.3<-lm(soma_porcoes_dia_verduras_legumes ~ tea + 
+            dificuldade_motora + constipacao + atraso_desenvolvimento_sn + 
+            tipo_focal_generalizada + sexo, data = analise2.new)
+summary(fit.3)
+
+
+
+modelo<-soma_porcoes_dia_verduras_legumes~di+constipacao+dificuldade_motora+sexo
+fit.teste<-lm(modelo, data=analise2.new)
+summary(fit.teste)
+
+fit.selecionado<-fit.teste
+
+# Resíduo studentizado
+X <- model.matrix(fit.selecionado)
+n <- nrow(X)
+p <- ncol(X)
+
+H <- X%*%solve(t(X)%*%X)%*%t(X)
+h <- diag(H)
+si <- lm.influence(fit.selecionado)$sigma
+sigma2<-summary(fit.selecionado)$sigma
+r <- resid(fit.selecionado)
+res.press <- r/(si*sqrt(1-h))
+res.stu<- r/sqrt(sigma2*(1-h))
+
+par(mfrow=c(1,1), mar=c(2,2,2,1))
+plot(res.stu, pch=19) # Não apresenta nenhum padrão
+
+which.max(res.stu)
+
+# Quem é a observação 26? 
+analise2.new[26,c(1:15,24)]
+summary(analise2.new[c(1:15,24)]) # Ela possui um valor alto na resposta
+
+# Nenhum ponto de alavanca
+plot(h, ylim = c(0,2*p/n))
+abline(h=2*p/n, lty=2,lwd=2 ,col="maroon")
+
+
+analise2.new[23,c(1:15,24)]
+summary(analise2.new[,c(1:15,24)])
+# Essa observação é a única que possui a condição de paralisia cerebral
+
+
+
+
+
+
 
 
 

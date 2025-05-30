@@ -58,7 +58,7 @@ colnames(dados_completos)<-c(
   "adeq_porcoes_dia_doces_salgadinhos_guloseimas"
 )
 
-  
+View(dados_completos)
 
 analise1<-dados_completos |>
   select(-c(2:14,)) 
@@ -89,4 +89,4 @@ dados_completos$atraso_desenvolvimento_sn[which(dados_completos$atraso_desenvolv
 
 analise2<-dados_completos |>
   filter(epilepsia=="E")
-
+View(analise2)
