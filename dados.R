@@ -58,10 +58,8 @@ colnames(dados_completos)<-c(
   "adeq_porcoes_dia_doces_salgadinhos_guloseimas"
 )
 
-View(dados_completos)
-
 analise1<-dados_completos |>
-  select(-c(2:14,)) 
+  dplyr::select(-c(2:14,)) 
 
 
 
@@ -89,4 +87,22 @@ dados_completos$atraso_desenvolvimento_sn[which(dados_completos$atraso_desenvolv
 
 analise2<-dados_completos |>
   filter(epilepsia=="E")
-View(analise2)
+
+
+# Retirar as colunas que não serão utilizadas
+analise2.new<-analise2[,-c(1,19,20,23,24,27,28,31,32,35,36,39,40,43,44,47,48)]
+
+# Transformando em fatores as variáveis categóricas com o número correto de levels
+analise2.new$tea<-factor(as.character(analise2.new$tea), levels=c("N","S"))
+analise2.new$di<-factor(as.character(analise2.new$di), levels=c("N","S"))
+analise2.new$tdah<-factor(as.character(analise2.new$tdah), levels=c("N","S"))
+analise2.new$dificuldade_motora<-factor(as.character(analise2.new$dificuldade_motora), levels=c("N","S"))
+analise2.new$paralisia_cerebral<-factor(as.character(analise2.new$paralisia_cerebral), levels=c("N","S"))
+analise2.new$disfagia<-factor(as.character(analise2.new$disfagia), levels=c("N","S"))
+analise2.new$rec_vomito_diarreia<-factor(as.character(analise2.new$rec_vomito_diarreia), levels=c("N","S"))
+analise2.new$constipacao<-factor(as.character(analise2.new$constipacao), levels=c("N","S"))
+analise2.new$atraso_desenvolvimento_sn<-factor(as.character(analise2.new$atraso_desenvolvimento_sn), levels=c("N","S"))
+analise2.new$epilepsia_farmacorressistente<-factor(as.character(analise2.new$epilepsia_farmacorressistente), levels=c("N","S"))
+analise2.new$tipo_focal_generalizada<-factor(as.character(analise2.new$tipo_focal_generalizada), levels=c("F","G"))
+analise2.new$etiologia<-factor(as.character(analise2.new$etiologia), levels=c("E","G","I"))
+
