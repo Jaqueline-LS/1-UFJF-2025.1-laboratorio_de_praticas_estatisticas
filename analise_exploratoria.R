@@ -87,7 +87,7 @@ stats::wilcox.test(X,Y) # n e m são menores que 20. Ver o valor tabelado.
 
 # Postos de X
 postos<-analise2.new |>
-  select(soma_porcoes_dia_verduras_legumes, tea)|>
+  dplyr::select(soma_porcoes_dia_verduras_legumes, tea)|>
   arrange(soma_porcoes_dia_verduras_legumes)
 postos.x<-which(postos$tea=="S") 
 
@@ -96,14 +96,45 @@ n<-length(X)
 m<-length(Y)
 N<-n+m
 Total.rank<-N*(N+1)/2 
-Wp.025<-278 # Tabela A7 Conover
+Wp.025<-297 # Tabela A7 Conover
 Wp.975<- n*(N+1)-Wp.025
 
-# A estatística foi 427, a região de não rejeição é [278, 444]. 
-# Não há evidências significativas para rejeitar a hipótese nula ao nível de 5%.
-# Ou seja, não parece haver diferenças nas porções diárias de verduras e legumes entre os pacientes com TEA e sem.
+# A estatística foi 427, e está na região rejeição >425.
+# Há evidências significativas para rejeitar a hipótese nula ao nível de 5%.
+# Ou seja, parece haver diferenças nas porções diárias de verduras e legumes entre os pacientes com TEA e sem.
 
 # A variável é continua
+
+
+require(exactRankTests)
+
+perm.test(X,Y, alternative = "two.sided")
+
+
+
+ind.di<-which(analise2.new$di=="S")
+X<-analise2.new$soma_porcoes_dia_verduras_legumes[ind.di]
+Y<-analise2.new$soma_porcoes_dia_verduras_legumes[-ind.di]
+hist(X)
+hist(Y)
+median(X)
+median(Y)
+stats::mood.test(X,Y)
+stats::wilcox.test(X,Y) # n e m são menores que 20. Ver o valor tabelado.
+
+# Postos de X
+postos<-analise2.new |>
+  dplyr::select(soma_porcoes_dia_verduras_legumes, di)|>
+  arrange(soma_porcoes_dia_verduras_legumes)
+postos.x<-which(postos$di=="S") 
+
+R.x<- sum(postos.x) # soma dos postos de X, a função wilcox.test dá o valor corrigido(menos o minimo)
+n<-length(X)
+m<-length(Y)
+N<-n+m
+Total.rank<-N*(N+1)/2 
+Wp.025<-297 # Tabela A7 Conover
+Wp.975<- n*(N+1)-Wp.025
 
 require(exactRankTests)
 

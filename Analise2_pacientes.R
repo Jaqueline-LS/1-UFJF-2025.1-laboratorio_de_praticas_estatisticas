@@ -10,27 +10,6 @@ source("C:/ufjf/2024.3/MlG/MLG/Funcoes/envelope.R")
 cores<-c("#FF9B95","#C9E69E","#BAF3DE","#FFC29A")
 # ----------------------------- ANALISE 2----------------------------------
 
-# Retirar as colunas que não serão utilizadas
-analise2.new<-analise2[,-c(c(1,19,20,23,24,27,28,31,32,35,36,39,40,43,44,47,48))]
-str(analise2.new)
-
-# Transformando em fatores as variáveis categóricas com o número correto de levels
-analise2.new$tea<-factor(as.character(analise2.new$tea), levels=c("N","S"))
-analise2.new$di<-factor(as.character(analise2.new$di), levels=c("N","S"))
-analise2.new$tdah<-factor(as.character(analise2.new$tdah), levels=c("N","S"))
-analise2.new$dificuldade_motora<-factor(as.character(analise2.new$dificuldade_motora), levels=c("N","S"))
-analise2.new$paralisia_cerebral<-factor(as.character(analise2.new$paralisia_cerebral), levels=c("N","S"))
-analise2.new$disfagia<-factor(as.character(analise2.new$disfagia), levels=c("N","S"))
-analise2.new$rec_vomito_diarreia<-factor(as.character(analise2.new$rec_vomito_diarreia), levels=c("N","S"))
-analise2.new$constipacao<-factor(as.character(analise2.new$constipacao), levels=c("N","S"))
-analise2.new$atraso_desenvolvimento_sn<-factor(as.character(analise2.new$atraso_desenvolvimento_sn), levels=c("N","S"))
-analise2.new$epilepsia_farmacorressistente<-factor(as.character(analise2.new$epilepsia_farmacorressistente), levels=c("N","S"))
-analise2.new$tipo_focal_generalizada<-factor(as.character(analise2.new$tipo_focal_generalizada), levels=c("F","G"))
-analise2.new$etiologia<-factor(as.character(analise2.new$etiologia), levels=c("E","G","I"))
-
-View(analise2.new)
-str(analise2.new)
-
 
 # Consumo adequado ou inadequado de verduras e legumes # Fazer separado para 13 e 12 e 15
 variaveis<-colnames(analise2.new)[c(2:11)]
@@ -211,6 +190,114 @@ colnames(tabela)<-c("Estimativa","Erro padrão", "p-valor")
 
 knitr::kable(tabela, caption = "Coeficentes estimados", format = "latex", escape = FALSE, booktabs=T) %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
+
+
+
+
+
+
+#------------------------------------- Modelo logístico-----------------------------
+analise2.new$adeq_porcoes_dia_verduras_legumes<-factor(analise2.new$adeq_porcoes_dia_verduras_legumes, levels=c("A","I"))
+Y<-adeq_porcoes_dia_verduras_legumes
+modelo<-Y ~ di + dificuldade_motora  + constipacao  + sexo
+
+fit<-glm(modelo, family = binomial(link = "logit"))
+envelope(fit,"envel_bino_logit")
+
+# Resíduos
+
+modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+
+
+selecaoModeloBinomial<-function(dados, modelo, ligacao, step="AIC")
+{
+  n<-nrow(dados)
+  fit1<-try(switch(ligacao,
+                   logit = glm(modelo, family=binomial(logit)),
+                   probit = glm(modelo, family=binomial(link=probit)),
+                   cauchit = glm(modelo, family=binomial(link=cauchit)),
+                   log = glm(modelo, family=binomial(link=log)),
+                   cloglog = glm(modelo, family=binomial(link=cloglog)),
+                   stop("Link não reconhecido")), silent = T)
+  summary(fit1)
+  
+  aux<-sum(class(fit1) != "try-error")
+  if(step=="JAQ")
+  {
+    fit<-try(stepJAQ(fit1, trace = 0), silent = T)
+  }else{
+    fit<-try(stepAIC(fit1, trace = 0), silent = T)
+    
+  }
+  aux2<-sum(class(fit) != "try-error")
+  if( aux!=0  && aux2!=0 )
+  {
+    fit.model<-fit
+  }else{
+    fit.model<-0
+  }
+  return(fit.model)
+}
+
+ResultadosBinom<-function(dados, modelo, ligacao, tipo, alfa=0.05, step="AIC")
+{
+  n<-nrow(dados)
+  familia<-paste0("Binomial-Link(",ligacao,")")
+  print(familia)
+  fits<-selecaoModeloBinomial(dados, modelo, ligacao, step)
+  if(is.numeric(fits))
+  {
+    bic<-NA
+    qualidade<-"Não Rodou"
+    modelo.s<-"-----"
+    
+  }else{
+    bic<-as.numeric(round(AIC(fits,k=log(n)),6))
+    modelo.s<-deparse(formula(fits))
+    teste<-try(envelope(fits,tipo), silent=T)
+    aux<-sum(class(teste) != "try-error")
+    if(aux==0)
+    {
+      qualidade<-"Não Rodou"
+    }else{
+      qualidade<-teste[[1]]
+    }
+  }
+  return(data.frame(Family=familia,
+                    QQplot=qualidade,
+                    BIC=bic,
+                    Modelo=modelo.s))
+  
+}
+
+
+residuos<-function(fit.model, dados)
+{
+  
+  X <- model.matrix(fit.model)
+  V <- fitted(fit.model)  # no Binomial, sao as proporcoes estimadas
+  Vm <- diag(V)
+  w <- fit.model$weights  # vetor de pesos
+  W <- diag(w)
+  H1 <- solve(t(X)%*%W%*%X)
+  H <- sqrt(W)%*%X%*%H1%*%t(X)%*%sqrt(W)
+  hii <- diag(H)  # vetor diagonal de H
+  
+  
+  # Resíduos
+  rD <- resid(fit.model, type= "deviance")
+  fi<-summary(fit.model)$dispersion
+  tD <- rD*sqrt(fi/(1-hii))   # residuo deviance padronizado
+  rp1 <- resid(fit.model, type= "pearson")
+  rP <- as.numeric(sqrt(fi)*rp1)
+  tS <- rP/sqrt(V*(1 - hii))  # Residuo padronizado
+  
+  # LDi
+  LD = hii*(tS^2)/(1-hii) # pode falhar de pi_i<0.1 ou pi_i>0.9. Neste caso, fazer  Ldi x pi_i
+  plot(tD, main="Resíduo")
+  plot(V,tD, main="Resíduo x Ajustado", xlab="Ajustado")
+  return(list(tD=tD, tS=tS, hii=hii, V=V, LD=LD))
+}
 
 
 
