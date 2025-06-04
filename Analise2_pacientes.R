@@ -194,81 +194,93 @@ knitr::kable(tabela, caption = "Coeficentes estimados", format = "latex", escape
 
 
 
-
-
 #------------------------------------- Modelo logístico-----------------------------
 analise2.new$adeq_porcoes_dia_verduras_legumes<-factor(analise2.new$adeq_porcoes_dia_verduras_legumes, levels=c("A","I"))
 Y<-adeq_porcoes_dia_verduras_legumes
-modelo<-Y ~ di + dificuldade_motora  + constipacao  + sexo
+
+# Modelo com as que apresentaram um diferença pelo qui-quadrado
+modelo<-Y ~ tea + dificuldade_motora + constipacao  + sexo +idade_atual_anos
+fit<-glm(modelo, family = binomial(link = "logit"))
+envelope(fit,"envel_bino_logit")
+summary(fit)
+# Elimina quase todas as variáveis
+
+modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+fit<-glm(modelo.completo, family = binomial(link = "logit"))
+envelope(fit,"envel_bino_logit")
+summary(fit)
+
+fit.selecionado<-stepJAQ(fit, alpha=0.1, trace = 1)
+summary(fit.selecionado)
+
+
+
+par(mfrow=c(2,3),mar=c(1,1,1,1))
+mosaicplot(table(Y,sexo), xlab='', main='')
+mosaicplot(table(Y,tea), xlab='', main='')
+mosaicplot(table(Y,constipacao), xlab='', main='')
+mosaicplot(table(Y, di), main='')
+boxplot(idade_atual_anos~Y)
+
+modelo<-Y ~ tea + constipacao +di  +idade_atual_anos
 
 fit<-glm(modelo, family = binomial(link = "logit"))
 envelope(fit,"envel_bino_logit")
+summary(fit)
 
-# Resíduos
-
-modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+exp(coefficients(fit))
 
 
-selecaoModeloBinomial<-function(dados, modelo, ligacao, step="AIC")
-{
-  n<-nrow(dados)
-  fit1<-try(switch(ligacao,
-                   logit = glm(modelo, family=binomial(logit)),
-                   probit = glm(modelo, family=binomial(link=probit)),
-                   cauchit = glm(modelo, family=binomial(link=cauchit)),
-                   log = glm(modelo, family=binomial(link=log)),
-                   cloglog = glm(modelo, family=binomial(link=cloglog)),
-                   stop("Link não reconhecido")), silent = T)
-  summary(fit1)
-  
-  aux<-sum(class(fit1) != "try-error")
-  if(step=="JAQ")
-  {
-    fit<-try(stepJAQ(fit1, trace = 0), silent = T)
-  }else{
-    fit<-try(stepAIC(fit1, trace = 0), silent = T)
-    
-  }
-  aux2<-sum(class(fit) != "try-error")
-  if( aux!=0  && aux2!=0 )
-  {
-    fit.model<-fit
-  }else{
-    fit.model<-0
-  }
-  return(fit.model)
-}
+a<-summary(fit)
 
-ResultadosBinom<-function(dados, modelo, ligacao, tipo, alfa=0.05, step="AIC")
-{
-  n<-nrow(dados)
-  familia<-paste0("Binomial-Link(",ligacao,")")
-  print(familia)
-  fits<-selecaoModeloBinomial(dados, modelo, ligacao, step)
-  if(is.numeric(fits))
-  {
-    bic<-NA
-    qualidade<-"Não Rodou"
-    modelo.s<-"-----"
-    
-  }else{
-    bic<-as.numeric(round(AIC(fits,k=log(n)),6))
-    modelo.s<-deparse(formula(fits))
-    teste<-try(envelope(fits,tipo), silent=T)
-    aux<-sum(class(teste) != "try-error")
-    if(aux==0)
-    {
-      qualidade<-"Não Rodou"
-    }else{
-      qualidade<-teste[[1]]
-    }
-  }
-  return(data.frame(Family=familia,
-                    QQplot=qualidade,
-                    BIC=bic,
-                    Modelo=modelo.s))
-  
-}
+tabela<-data.frame(a$coefficients)[-3]
+colnames(tabela)<-c("Estimativa","Erro padrão", "p-valor")
+
+knitr::kable(tabela, caption = "Coeficentes estimados", format = "latex", escape = FALSE, booktabs=T) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+
+
+
+# Interpretação
+
+# Controlado pelas demais variáveis
+# A "chance" (odds) da porção diária ser inadequada
+# para um indivíduo com TEA é 0.07 vezes a chance de
+# de um paciente sem a condição.
+
+# Ou seja, a odds/chance do paciente ter um consumo inadequado
+# é maior nos pacientes sem TEA.
+
+
+# Controlado pelas demais variáveis
+# A "chance" (odds) da porção diária ser inadequada
+# para um indivíduo com coonstipação é 0.03 vezes a chance de
+# de um paciente sem a condição.
+
+# Ou seja, a odds/chance do paciente ter um consumo inadequado
+# é maior nos pacientes sem constipação.
+
+
+# Controlado pelas demais variáveis
+# A "chance" (odds) da porção diária ser inadequada
+# para um indivíduo com coonstipação é 0.03 vezes a chance de
+# de um paciente sem a condição.
+
+# Ou seja, a odds/chance do paciente ter um consumo inadequado
+# é maior nos pacientes sem constipação.
+
+
+# Controlado pelas demais variáveis
+# A "chance" (odds) da porção diária ser inadequada
+# para um indivíduo com TDI é aproximadamente 30 vezes a chance de
+# de um paciente sem a condição.
+
+# Ou seja, a odds/chance do paciente ter um consumo inadequado
+# é menor nos pacientes sem TDI.
+
+# Controlado pelas demais variáveis a chance da porção diária ser inadequada
+# reduz em apróximadamente (1-0.7667) 23% para cada ano incrementado na idade do paciente.
+# Ou seja, a chance da ingestão dos alimentos ser inadequada nos pacientes mais novos é maior.
 
 
 residuos<-function(fit.model, dados)
@@ -299,5 +311,11 @@ residuos<-function(fit.model, dados)
   return(list(tD=tD, tS=tS, hii=hii, V=V, LD=LD))
 }
 
+resid<-residuos(fit, analise2.new)
+plot(resid$hii)
 
+which.max(resid$hii)
 
+analise2.new[21,c(2,3,9,14,25)]
+
+summary(analise2.new[,c(2,3,9,14,25)])

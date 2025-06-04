@@ -133,6 +133,7 @@ residuos<-function(fit.model, dados)
 
 ## Adequação da porção diária de legumes e verduras
 ```{r}
+attach(analise2.new)
 #------------------------------------- Modelo  logístico-----------------------------
 analise2.new$adeq_porcoes_dia_verduras_legumes<-factor(analise2.new$adeq_porcoes_dia_verduras_legumes, levels=c("A","I"))
 Y<-adeq_porcoes_dia_verduras_legumes
@@ -238,9 +239,16 @@ residuos<-function(fit.model, dados)
 }
 
 ResultadosBinom(analise2.new, modelo.completo, ligacao = "logit", tipo ="envel_bino_logit", step = "JAQ", alfa=0.05)
+
 modelo.selecionado<-Y ~ tea + di + tdah + dificuldade_motora + tipo_focal_generalizada + constipacao + etiologia + idade_atual_anos + sexo
 fit.selecionado<-glm(modelo.selecionado, family=binomial(link="logit"))
 summary(fit.selecionado)
+
+
+T2<-chisq.test(table(tea, Y), correct = F)
+T3<-chisq.test(table(di, Y), correct = F)
+T4<-chisq.test(table(constipacao, Y), correct = F)
+T5<-chisq.test(table(dificuldade_motora, Y), correct = F)
 
 
 modelo.selecionado<-Y ~ tea + di  + constipacao  + idade_atual_anos 
