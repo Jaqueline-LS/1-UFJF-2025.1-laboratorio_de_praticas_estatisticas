@@ -234,12 +234,19 @@ exp(coefficients(fit))
 a<-summary(fit)
 
 tabela<-data.frame(a$coefficients)[-3]
-colnames(tabela)<-c("Estimativa","Erro padrão", "p-valor")
 
+c1<-exp(tabela[,1])
+c2<-exp(tabela[,1]-(1.96*tabela[,2]))
+c3<-exp(tabela[,1]+(1.96*tabela[,2]))
+
+colnames(tabela)<-c("Estimativa","Erro padrão", "p-valor")
 knitr::kable(tabela, caption = "Coeficentes estimados", format = "latex", escape = FALSE, booktabs=T) %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
 
-
+tabela2<-data.frame(c1,c2,c3)
+colnames(tabela2)<-c("OR","LI", "LS")
+knitr::kable(tabela2, caption = "Razão de chances estimadas", format = "latex", escape = FALSE, booktabs=T) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
 
 # Interpretação
 
