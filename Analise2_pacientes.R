@@ -330,7 +330,7 @@ summary(analise2.new[,c(2,3,9,14,25)])
 
 
 #------------------------Adequação do consumo de doces, salgadinhos e guloseimas-------------- 
-
+n=37
 analise2.new$adeq_porcoes_dia_doces_salgadinhos_guloseimas<-factor(analise2.new$adeq_porcoes_dia_doces_salgadinhos_guloseimas, levels=c("A","I"))
 attach(analise2.new)
 Y<-adeq_porcoes_dia_doces_salgadinhos_guloseimas
@@ -385,4 +385,20 @@ knitr::kable(tabela2, caption = "Razão de chances estimadas", format = "latex",
   kable_styling(latex_options = c("hold_position", "scale_down"))
 
 
+resid<-residuos(fit, analise2.new)
+plot(resid$hii)
+
+abline(h=2*sum(resid$hii)/n, lty=2,col="maroon")
+
+
+#-------------------------
+Y<-soma_doces_salgadinhos_guloseimas
+modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+fit.inicial<-lm(modelo.completo, data=analise2.new)
+summary(fit.inicial)
+
+
+modelo.completo<-Y~disfagia+paralisia_cerebral
+fit.inicial<-lm(modelo.completo, data=analise2.new)
+summary(fit.inicial)
 

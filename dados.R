@@ -61,6 +61,9 @@ colnames(dados_completos)<-c(
 analise1<-dados_completos |>
   dplyr::select(-c(2:14,)) 
 
+analise1.new<-analise1[,-c(1,5,7,11,15,19,23,27,31,35,39)]
+
+
 
 
 
