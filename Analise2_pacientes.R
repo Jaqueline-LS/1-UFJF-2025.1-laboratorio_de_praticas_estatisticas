@@ -326,3 +326,63 @@ which.max(resid$hii)
 analise2.new[21,c(2,3,9,14,25)]
 
 summary(analise2.new[,c(2,3,9,14,25)])
+
+
+
+#------------------------Adequação do consumo de doces, salgadinhos e guloseimas-------------- 
+
+analise2.new$adeq_porcoes_dia_doces_salgadinhos_guloseimas<-factor(analise2.new$adeq_porcoes_dia_doces_salgadinhos_guloseimas, levels=c("A","I"))
+attach(analise2.new)
+Y<-adeq_porcoes_dia_doces_salgadinhos_guloseimas
+
+
+par(mfrow=c(1,3), mar=c(2,2,2,2))
+mosaicplot(table(Y,etiologia), xlab='', main='', col=cores[c(1:3)])
+mosaicplot(table(Y,tipo_focal_generalizada), xlab='', main='', color = cores[c(1,2)])
+mosaicplot(table(Y,disfagia), xlab='', main='', col=cores[c(1:3)])
+
+
+# Modelo com as que apresentaram um diferença pelo qui-quadrado
+modelo<-Y ~ tea + dificuldade_motora + constipacao  + sexo +idade_atual_anos
+fit<-glm(modelo, family = binomial(link = "logit"))
+envelope(fit,"envel_bino_logit")
+summary(fit)
+# Elimina todas as variáveis
+
+modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+fit<-glm(modelo.completo, family = binomial(link = "logit"))
+envelope(fit,"envel_bino_logit")
+summary(fit)
+
+
+
+# Retirando uma por uma sobre só etiologia
+
+modelo.completo<-Y~etiologia+tipo_focal_generalizada
+fit<-glm(modelo.completo, family = binomial(link = "logit"))
+envelope(fit,"envel_bino_logit")
+summary(fit)
+
+
+exp(coefficients(fit))
+
+
+a<-summary(fit)
+
+tabela<-data.frame(a$coefficients)[-3]
+
+c1<-exp(tabela[,1])
+c2<-exp(tabela[,1]-(1.96*tabela[,2]))
+c3<-exp(tabela[,1]+(1.96*tabela[,2]))
+
+colnames(tabela)<-c("Estimativa","Erro padrão", "p-valor")
+knitr::kable(tabela, caption = "Coeficentes estimados", format = "latex", escape = FALSE, booktabs=T) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+
+tabela2<-data.frame(c1,c2,c3)
+colnames(tabela2)<-c("OR","LI", "LS")
+knitr::kable(tabela2, caption = "Razão de chances estimadas", format = "latex", escape = FALSE, booktabs=T) %>%
+  kable_styling(latex_options = c("hold_position", "scale_down"))
+
+
+
