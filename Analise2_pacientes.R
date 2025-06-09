@@ -17,7 +17,6 @@ attach(analise2.new)
 
 teste.mood.p<-numeric(length(variaveis)+2)
 teste.wilcox.p<-numeric(length(variaveis)+2)
-teste.wilcox<-vector("list",length(variaveis)+2)
 teste.aleat.p<-numeric(length(variaveis)+2)
 
 Analise.exp<-function(Y, nome.plot)
@@ -34,21 +33,8 @@ Analise.exp<-function(Y, nome.plot)
     ind<-which(get(variaveis[i])=="S") # Pega as que são "S
     X1<-Y[ind]
     X2<-Y[-ind]
-    n<-length(X1)
-    m<-length(X2)
-    postos<-analise2.new |>
-      dplyr::select(var, variaveis[i])|>
-      arrange(Y)
-    postos.x<-which(postos[,2]=="S") 
-    
-    R.x<- sum(postos.x)  # soma dos postos de X, a função wilcox.test dá o valor corrigido(menos o minimo)
-  
     teste.mood.p[i]<-mood.test(X1,X2)$p.value
-    Z<-wilcox.test(X1,X2)
-    teste.wilcox.p[i]<-Z$p.value 
-    
-    teste.wilcox[[i]]<-ifelse((n>20 || m>20),test=list(i=0,n=n,m=m,R.x=R.x),test=list(i=1,n=n,m=m,R.x=R.x)) # n e m são menores que 20. Ver o valor tabelado.
-    
+    teste.wilcox.p[i]<-wilcox.test(X1,X2)$p.value 
     teste.aleat.p[i]<-exactRankTests::perm.test(X1,X2)$p.value
   }
   
@@ -61,8 +47,8 @@ Analise.exp<-function(Y, nome.plot)
   X1<-Y[ind]
   X2<-Y[-ind]
   teste.mood.p[11]<-mood.test(X1,X2)$p.value
-  teste.wilcox.p[11]<-(wilcox.test(X1,X2)$p.value) # n e m são menores que 20. Ver o valor tabelado.
-  teste.ansari[11]<-ansari.test(X1,X2)$p.value
+  teste.wilcox.p[11]<-wilcox.test(X1,X2)$p.value # n e m são menores que 20. Ver o valor tabelado.
+  teste.aleat.p[11]<-exactRankTests::perm.test(X1,X2)$p.value
   
   with(analise2.new,
        boxplot(Y~get(colnames(analise2.new)[15]), 
@@ -72,8 +58,8 @@ Analise.exp<-function(Y, nome.plot)
   X1<-Y[ind]
   X2<-Y[-ind]
   teste.mood.p[12]<-mood.test(X1,X2)$p.value
-  teste.wilcox.p[12]<-(wilcox.test(X1,X2)$p.value) # n e m são menores que 20. Ver o valor tabelado.
-  teste.ansari[12]<-ansari.test(X1,X2)$p.value
+  teste.wilcox.p[12]<-wilcox.test(X1,X2)$p.value # n e m são menores que 20. Ver o valor tabelado.
+  teste.aleat.p[12]<-exactRankTests::perm.test(X1,X2)$p.value
   
   with(analise2.new,
        boxplot(Y~get(colnames(analise2.new)[13]), 
@@ -94,13 +80,11 @@ Analise.exp<-function(Y, nome.plot)
   
   kruskal.p<-c(rep(NA,12),kruskal.test(Y,etiologia)$p.value)
   
-  # Resuminho dos testes para as variáveis explicativas em relação a soma de verduras e legumes
-  tabela<-data.frame(variáveis=c(variaveis,colnames(analise2.new)[c(12,15,13)]), mood=c(teste.mood.p,NA), wilcox=c(teste.wilcox.p,NA), kruskal=kruskal.p)
+  # Resuminho dos testes 
+  tabela<-data.frame(variáveis=c(variaveis,colnames(analise2.new)[c(12,15,13)]), mood=c(teste.mood.p,NA), wilcox=c(teste.wilcox.p,NA),aleatorização=c(teste.aleat.p,NA), kruskal=kruskal.p)
   
   knitr::kable(tabela, caption = "Resultado dos testes", format = "latex", escape = FALSE, booktabs=T) %>%
     kable_styling(latex_options = c("hold_position", "scale_down"))
-  
-  
   
 }
 
@@ -114,8 +98,8 @@ names(somas.resp)<-c("Leite_e_produtos_lácteos", "Cerais,_pães_e_túrbeculos",
                      "Embutidos","Salgados_e_preparações", "Doces,_salgadinhos_e_guloseimas")
 length(somas.resp)
 #------------------------------Soma de verduras e legumes--------------------
-soma<-somas.resp[[9]]
-Analise.exp(Y=get(soma),var=soma, nome.plot=names(somas.resp)[[9]])
+Y<-get(somas.resp[[4]])
+Analise.exp(Y,nome.plot=names(somas.resp)[[4]])
 # Não poderia ter aplicado o teste U da Mann-Whitney para verduras e legumes 
 # Para a comparação entre adequado e farmaco resistente.
 
