@@ -67,13 +67,21 @@ adequacao.E.vs.C<-function(Y)
     Teste<-chisq.test(table(epilepsia, Y), correct = F)
     
   }
-  Teste
-  fit<-glm(Y~sexo+epilepsia+idade_atual_anos, data = analise1.new, family = binomial(link = "logit"))
-  summary(fit)
-  fit<-glm(Y~sexo+epilepsia, data = analise1.new, family = binomial(link = "logit"))
-  summary(fit)
+  
+  print(Teste)
+  
+  fit1<-glm(Y~sexo+epilepsia+idade_atual_anos, data = analise1.new, family = binomial(link = "logit"))
+  summary(fit1)
+  
   
   
 }
-
+adequacao.E.vs.C(Y=adeq_porcoes_dia_laticinios)
+adequacao.E.vs.C(Y=adeq_porcoes_dia_cereais_total)
+adequacao.E.vs.C(Y=adeq_porcoes_dia_cereais_saudaveis)
 adequacao.E.vs.C(Y=adeq_porcoes_dia_verduras_legumes)
+adequacao.E.vs.C(Y=adeq_porcoes_dia_frutas)
+adequacao.E.vs.C(Y=adeq_porcoes_dia_carnes_ovos)
+adequacao.E.vs.C(Y=adeq_porcoes_semana_embutidos)
+adequacao.E.vs.C(Y=adeq_porcoes_semana_salgados_preparacoes)
+
