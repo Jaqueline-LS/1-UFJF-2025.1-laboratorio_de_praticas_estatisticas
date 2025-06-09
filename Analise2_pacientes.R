@@ -15,72 +15,107 @@ cores<-c("#FF9B95","#C9E69E","#BAF3DE","#FFC29A")
 variaveis<-colnames(analise2.new)[c(2:11)]
 attach(analise2.new)
 
-par(mfrow=c(3,5), mar=c(2,2,1,1))
 teste.mood.p<-numeric(length(variaveis)+2)
 teste.wilcox.p<-numeric(length(variaveis)+2)
-teste.ansari<-numeric(length(variaveis)+2)
+teste.wilcox<-vector("list",length(variaveis)+2)
+teste.aleat.p<-numeric(length(variaveis)+2)
 
-for(i in seq_along(variaveis))
+Analise.exp<-function(Y, nome.plot)
 {
+  jpeg(file=paste0("Resultados/", nome.plot,"_boxplots.jpg"), width = 1500, height = 800, quality = 100, pointsize = 20)
+  par(mfrow=c(3,5), mar=c(2,2,2,1),
+      cex.main=0.8)
+  for(i in seq_along(variaveis))
+  {
+    with(analise2.new,
+         boxplot(Y~get(variaveis[i]), 
+                 col=cores, main=paste0(variaveis[i]),
+                 ylab="", xlab=""))
+    ind<-which(get(variaveis[i])=="S") # Pega as que são "S
+    X1<-Y[ind]
+    X2<-Y[-ind]
+    n<-length(X1)
+    m<-length(X2)
+    postos<-analise2.new |>
+      dplyr::select(var, variaveis[i])|>
+      arrange(Y)
+    postos.x<-which(postos[,2]=="S") 
+    
+    R.x<- sum(postos.x)  # soma dos postos de X, a função wilcox.test dá o valor corrigido(menos o minimo)
+  
+    teste.mood.p[i]<-mood.test(X1,X2)$p.value
+    Z<-wilcox.test(X1,X2)
+    teste.wilcox.p[i]<-Z$p.value 
+    
+    teste.wilcox[[i]]<-ifelse((n>20 || m>20),test=list(i=0,n=n,m=m,R.x=R.x),test=list(i=1,n=n,m=m,R.x=R.x)) # n e m são menores que 20. Ver o valor tabelado.
+    
+    teste.aleat.p[i]<-exactRankTests::perm.test(X1,X2)$p.value
+  }
+  
+  colnames(analise2.new)[c(12,13,15)]
   with(analise2.new,
-       boxplot(soma_porcoes_dia_verduras_legumes~get(variaveis[i]), 
-               col=cores, main=paste0(variaveis[i]),
+       boxplot(Y~get(colnames(analise2.new)[12]), 
+               col=cores, main=paste0(colnames(analise2.new)[12]),
                ylab="", xlab=""))
-  ind<-which(get(variaveis[i])=="S") # Pega as que são "S
-  X<-soma_porcoes_dia_verduras_legumes[ind]
-  Y<-soma_porcoes_dia_verduras_legumes[-ind]
-  teste.mood.p[i]<-mood.test(X,Y)$p.value
-  teste.wilcox.p[i]<-(wilcox.test(X,Y)$p.value) # n e m são menores que 20. Ver o valor tabelado.
-  teste.ansari[i]<-ansari.test(X,Y)$p.value
+  ind<-which(get(colnames(analise2.new)[12])=="F") # Pega as que são "F"
+  X1<-Y[ind]
+  X2<-Y[-ind]
+  teste.mood.p[11]<-mood.test(X1,X2)$p.value
+  teste.wilcox.p[11]<-(wilcox.test(X1,X2)$p.value) # n e m são menores que 20. Ver o valor tabelado.
+  teste.ansari[11]<-ansari.test(X1,X2)$p.value
+  
+  with(analise2.new,
+       boxplot(Y~get(colnames(analise2.new)[15]), 
+               col=cores, main=paste0(colnames(analise2.new)[15]),
+               ylab="", xlab=""))
+  ind<-which(get(colnames(analise2.new)[15])=="F") # Pega as que são "F"
+  X1<-Y[ind]
+  X2<-Y[-ind]
+  teste.mood.p[12]<-mood.test(X1,X2)$p.value
+  teste.wilcox.p[12]<-(wilcox.test(X1,X2)$p.value) # n e m são menores que 20. Ver o valor tabelado.
+  teste.ansari[12]<-ansari.test(X1,X2)$p.value
+  
+  with(analise2.new,
+       boxplot(Y~get(colnames(analise2.new)[13]), 
+               col=cores, main=paste0(colnames(analise2.new)[13]),
+               ylab="", xlab=""))
+  
+  plot(Y~idade_atual_anos,pch=20, 
+       xlab="", 
+       ylab="",
+       main=paste0("Idade vs. Porções(",nome.plot,") "))
+  dev.off()
+  
+  # Kruskal-Wallis, que é uma extensão do teste Wilcoxon-Mann-Whitney 
+  # para mais amostras independentes
+  kruskal.test(Y,etiologia)
+  
+  # Não deu significativo
+  
+  kruskal.p<-c(rep(NA,12),kruskal.test(Y,etiologia)$p.value)
+  
+  # Resuminho dos testes para as variáveis explicativas em relação a soma de verduras e legumes
+  tabela<-data.frame(variáveis=c(variaveis,colnames(analise2.new)[c(12,15,13)]), mood=c(teste.mood.p,NA), wilcox=c(teste.wilcox.p,NA), kruskal=kruskal.p)
+  
+  knitr::kable(tabela, caption = "Resultado dos testes", format = "latex", escape = FALSE, booktabs=T) %>%
+    kable_styling(latex_options = c("hold_position", "scale_down"))
+  
+  
+  
 }
 
-colnames(analise2.new)[c(12,13,15)]
-with(analise2.new,
-     boxplot(soma_porcoes_dia_verduras_legumes~get(colnames(analise2.new)[12]), 
-             col=cores, main=paste0(colnames(analise2.new)[12]),
-             ylab="", xlab=""))
-ind<-which(get(colnames(analise2.new)[12])=="F") # Pega as que são "F"
-X<-soma_porcoes_dia_verduras_legumes[ind]
-Y<-soma_porcoes_dia_verduras_legumes[-ind]
-teste.mood.p[11]<-mood.test(X,Y)$p.value
-teste.wilcox.p[11]<-(wilcox.test(X,Y)$p.value) # n e m são menores que 20. Ver o valor tabelado.
-teste.ansari[11]<-ansari.test(X,Y)$p.value
 
-with(analise2.new,
-     boxplot(soma_porcoes_dia_verduras_legumes~get(colnames(analise2.new)[15]), 
-             col=cores, main=paste0(colnames(analise2.new)[15]),
-             ylab="", xlab=""))
-ind<-which(get(colnames(analise2.new)[15])=="F") # Pega as que são "F"
-X<-soma_porcoes_dia_verduras_legumes[ind]
-Y<-soma_porcoes_dia_verduras_legumes[-ind]
-teste.mood.p[12]<-mood.test(X,Y)$p.value
-teste.wilcox.p[12]<-(wilcox.test(X,Y)$p.value) # n e m são menores que 20. Ver o valor tabelado.
-teste.ansari[12]<-ansari.test(X,Y)$p.value
-
-with(analise2.new,
-     boxplot(soma_porcoes_dia_verduras_legumes~get(colnames(analise2.new)[13]), 
-             col=cores, main=paste0(colnames(analise2.new)[13]),
-             ylab="", xlab=""))
-
-
-#plot(soma_porcoes_dia_verduras_legumes~idade_atual_anos,pch=19, xlab="Idade atual em anos", ylab="Soma de porções por dia de verduras e legumes")
-
-# Kruskal-Wallis, que é uma extensão do teste Wilcoxon-Mann-Whitney 
-# para mais amostras independentes
-kruskal.test(soma_porcoes_dia_verduras_legumes,etiologia)
-
-# Não deu significativo
-
-kruskal.p<-c(rep(NA,12),kruskal.test(soma_porcoes_dia_verduras_legumes,etiologia)$p.value)
-
-# Resuminho dos testes para as variáveis explicativas em relação a soma de verduras e legumes
-tabela<-data.frame(variáveis=c(variaveis,colnames(analise2.new)[c(12,15,13)]), mood=c(teste.mood.p,NA), wilcox=c(teste.wilcox.p,NA), kruskal=kruskal.p)
-
-knitr::kable(tabela, caption = "Resultado dos testes", format = "latex", escape = FALSE, booktabs=T) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
-
-
-
+somas.resp<-list("soma_porcoes_dia_laticinios","soma_porcoes_dia_cereais_total", "soma_porcoes_dia_cereais_saudaveis",
+                 "soma_porcoes_dia_verduras_legumes", "soma_porcoes_dia_frutas", "soma_porcoes_dia_carnes_ovos",
+                 "soma_porcoes_semana_embutidos", "soma_porcoes_semana_salgados_preparacoes", 'soma_porcoes_semana_doces_salgadinhos_guloseimas')
+names(somas.resp)<-c("Leite_e_produtos_lácteos", "Cerais,_pães_e_túrbeculos",
+                     "Cerais,_pães_e_túrbeculos_saudáveis",
+                     "Verduras_e_legumes", "Frutas","Carne_e_ovos",
+                     "Embutidos","Salgados_e_preparações", "Doces,_salgadinhos_e_guloseimas")
+length(somas.resp)
+#------------------------------Soma de verduras e legumes--------------------
+soma<-somas.resp[[9]]
+Analise.exp(Y=get(soma),var=soma, nome.plot=names(somas.resp)[[9]])
 # Não poderia ter aplicado o teste U da Mann-Whitney para verduras e legumes 
 # Para a comparação entre adequado e farmaco resistente.
 
@@ -392,76 +427,6 @@ abline(h=2*sum(resid$hii)/n, lty=2,col="maroon")
 
 
 #-------------------------
-Y<-soma_porcoes_semana_doces_salgadinhos_guloseimas
-# Consumo adequado ou inadequado de verduras e legumes
-variaveis<-colnames(analise2.new)[c(2:11)]
-attach(analise2.new)
-
-par(mfrow=c(3,5), mar=c(2,2,1,1))
-teste.mood.p<-numeric(length(variaveis)+2)
-teste.wilcox.p<-numeric(length(variaveis)+2)
-teste.ansari<-numeric(length(variaveis)+2)
-
-for(i in seq_along(variaveis))
-{
-  with(analise2.new,
-       boxplot(Y~get(variaveis[i]), 
-               col=cores, main=paste0(variaveis[i]),
-               ylab="", xlab=""))
-  ind<-which(get(variaveis[i])=="S") # Pega as que são "S
-  X1<-Y[ind]
-  X2<-Y[-ind]
-  teste.mood.p[i]<-mood.test(X1,X2)$p.value
-  teste.wilcox.p[i]<-(wilcox.test(X1,X2)$p.value) # n e m são menores que 20. Ver o valor tabelado.
-  teste.ansari[i]<-ansari.test(X1,X2)$p.value
-}
-
-colnames(analise2.new)[c(12,13,15)]
-with(analise2.new,
-     boxplot(Y~get(colnames(analise2.new)[12]), 
-             col=cores, main=paste0(colnames(analise2.new)[12]),
-             ylab="", xlab=""))
-ind<-which(get(colnames(analise2.new)[12])=="F") # Pega as que são "F"
-X1<-Y[ind]
-X2<-Y[-ind]
-teste.mood.p[11]<-mood.test(X1,X2)$p.value
-teste.wilcox.p[11]<-(wilcox.test(X1,X2)$p.value) # n e m são menores que 20. Ver o valor tabelado.
-teste.ansari[11]<-ansari.test(X1,X2)$p.value
-
-with(analise2.new,
-     boxplot(Y~get(colnames(analise2.new)[15]), 
-             col=cores, main=paste0(colnames(analise2.new)[15]),
-             ylab="", xlab=""))
-ind<-which(get(colnames(analise2.new)[15])=="F") # Pega as que são "F"
-X1<-Y[ind]
-X2<-Y[-ind]
-teste.mood.p[12]<-mood.test(X1,X2)$p.value
-teste.wilcox.p[12]<-(wilcox.test(X1,X2)$p.value) # n e m são menores que 20. Ver o valor tabelado.
-teste.ansari[12]<-ansari.test(X1,X2)$p.value
-
-with(analise2.new,
-     boxplot(Y~get(colnames(analise2.new)[13]), 
-             col=cores, main=paste0(colnames(analise2.new)[13]),
-             ylab="", xlab=""))
-
-
-#plot(soma_porcoes_dia_verduras_legumes~idade_atual_anos,pch=19, xlab="Idade atual em anos", ylab="Soma de porções por dia de verduras e legumes")
-
-# Kruskal-Wallis, que é uma extensão do teste Wilcoxon-Mann-Whitney 
-# para mais amostras independentes
-kruskal.test(Y,etiologia)
-
-# Não deu significativo
-
-kruskal.p<-c(rep(NA,12),kruskal.test(Y,etiologia)$p.value)
-
-# Resuminho dos testes para as variáveis explicativas em relação a soma de verduras e legumes
-tabela<-data.frame(variáveis=c(variaveis,colnames(analise2.new)[c(12,15,13)]), mood=c(teste.mood.p,NA), wilcox=c(teste.wilcox.p,NA), kruskal=kruskal.p)
-
-knitr::kable(tabela, caption = "Resultado dos testes", format = "latex", escape = FALSE, booktabs=T) %>%
-  kable_styling(latex_options = c("hold_position", "scale_down"))
-
-
 
 
 modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
