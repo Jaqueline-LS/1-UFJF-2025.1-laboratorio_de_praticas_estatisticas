@@ -266,6 +266,7 @@ summary(fit.inicial)
 modelo.selecionado<-Y~tipo_focal_generalizada
 fit2<-lm(modelo.selecionado, data=analise2.new)
 summary(fit2)
+# Modelo não significativo 
 analise.res(fit2,9)
 #------------------------
 
