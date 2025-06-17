@@ -221,7 +221,7 @@ summary(fit.inicial)
 modelo.selecionado<-Y~dificuldade_motora+rec_vomito_diarreia+constipacao
 fit2<-lm(modelo.selecionado, data=analise2.new)
 summary(fit2)
-
+# Não chegou em um modelo significativo
 
 #------------------- Embutidos------------------
 Y<-get(somas.resp[[7]])
@@ -231,18 +231,43 @@ modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorres
 fit.inicial<-lm(modelo.completo, data=analise2.new)
 summary(fit.inicial)
 
-modelo.selecionado<-Y~dificuldade_motora+rec_vomito_diarreia+constipacao
+modelo.selecionado<-Y~sexo
+fit2<-lm(modelo.selecionado, data=analise2.new)
+summary(fit2)
+# Também não chegou em um modelo significativo
+
+#------------------------
+
+#------------------- Salgados e preparações------------------
+Y<-get(somas.resp[[8]])
+Analise.exp(Y,nome.plot=names(somas.resp)[[8]])
+
+modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+fit.inicial<-lm(modelo.completo, data=analise2.new)
+summary(fit.inicial)
+
+modelo.selecionado<-Y~0+rec_vomito_diarreia+atraso_desenvolvimento_sn+idade_atual_anos
 fit2<-lm(modelo.selecionado, data=analise2.new)
 summary(fit2)
 
-
+analise.res(fit2,8)
 #------------------------
 
 
 
+#------------------- Doces, salgados e preparações------------------
+Y<-get(somas.resp[[9]])
+Analise.exp(Y,nome.plot=names(somas.resp)[[9]])
 
+modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+fit.inicial<-lm(modelo.completo, data=analise2.new)
+summary(fit.inicial)
 
-
+modelo.selecionado<-Y~tipo_focal_generalizada
+fit2<-lm(modelo.selecionado, data=analise2.new)
+summary(fit2)
+analise.res(fit2,9)
+#------------------------
 
 
 
