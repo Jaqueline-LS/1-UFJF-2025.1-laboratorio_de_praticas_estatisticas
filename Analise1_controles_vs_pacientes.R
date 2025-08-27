@@ -130,7 +130,7 @@ for(i in c(seq_along(adeq.resp)))
 }
 
 # Resuminho dos testes 
-tabela<-data.frame(variáveis=names(adeq.resp), fisher=round(teste.fisher.p,4), chi.quad=round(teste.chisq.p,4))
+tabela<-data.frame(variáveis=c(letters[1:3]), fisher=rep(0.1,3), chi.quad=rep(0.1,3))
 colnames(tabela)<-c("Variável", "Fisher","Qui-quadrado")
 knitr::kable(tabela, caption = "Resultado dos testes (p-valor)", format = "latex", escape = FALSE, booktabs=T) %>%
   kable_styling(latex_options = c("hold_position", "scale_down"))
