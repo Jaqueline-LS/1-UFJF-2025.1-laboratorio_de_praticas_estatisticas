@@ -3,6 +3,7 @@ attach(analise2.new)
 suppressMessages(library("dplyr"))
 suppressMessages(library("MASS"))
 suppressMessages(library("readr"))
+suppressMessages(library("stringr"))
 library("kableExtra")
 
 # Funções de MLG
@@ -66,62 +67,88 @@ fit.inicial<-lm(modelo.completo, data=analise2.new)
 summary(fit.inicial)
 resumo<-summary(fit.inicial)
 
-remover<-which.max(resumo$coefficients[,4][as.numeric(which(resumo$coefficients[,4]>0.05))])
-
-fit <- update(modelo.completo, paste("~ . -", names(remover)))
-fit.inicial<-lm(modelo.completo, data=analise2.new)
-
-
-while (steps > 0) {
-    steps <- steps - 1
-    scope <- drop.scope(fit) # Conjunto de variáveis no modelo atual
-    
-    if (length(scope) == 0) break  # Não há mais variáveis para remover
-    
-    # Avaliar p-valor para cada variável que ainda esta no modelo
-    pvalues <- sapply(scope, function(term) get_pvalue(fit, term))
-    # Encontrar a variável com o maior p-valor
-    max_pvalue <- max(pvalues)
-    term_to_remove <- scope[which.max(pvalues)]
-    
-    if (max_pvalue > alpha) {
-      # Remover a variável com o maior p-valor
-      fit <- update(fit, paste("~ . -", term_to_remove))
-      if (trace) {
-        cat("\nVariável removida:", term_to_remove, "( p-valor =", max_pvalue,")\n")
-        cat("Novo modelo:", deparse(formula(fit)), "\n")
-      }
-
-    } else {
-      break  # Nenhuma variável com p-valor maior que alpha
-    }
-  }
-  if(trace)
+selecao.pvalor<-function(fit.inicial, alpha=0.05, steps=1000)
+{
+  while(steps>0)
   {
-    cat("\nModelo selecionado:", deparse(formula(fit)),"\n")
+      steps<-steps-1
+      resumo<-summary(fit.inicial)
+      scope<-drop.scope(fit.inicial)
+      # Avaliar p-valor para cada variável/categoria que ainda esta no modelo
+      pvalues <- resumo$coefficients[,4]
+      scope.cat <- names(pvalues) # Conjunto de variáveis no modelo atual
+      if (length(scope) == 0) break  # Não há mais variáveis para remover
+  
+      # Encontrar a variável com o maior p-valor
+      max_pvalue <- max(pvalues)
+      term_to_remove <- scope.cat[which.max(pvalues)]
+
+      base <- substr(term_to_remove, 1, nchar(term_to_remove) - 1)
+      term_to_remove<-scope[startsWith(scope, base)]
+      if (max_pvalue > alpha) {
+        # Remover a variável/categoria com o maior p-valor
+        modelo <- update(fit.inicial, paste("~ . -", term_to_remove))
+        cat("\nVariável removida:", term_to_remove, "( p-valor =", max_pvalue,")\n")
+        cat("Novo modelo:", deparse(formula(modelo)), "\n")
+        fit.inicial<-modelo
+
+      } else {
+        break  # Nenhuma variável com p-valor maior que alpha
+      }
+      print(summary(fit.inicial))
   }
-  return(fit)
+  return(fit.inicial)
+ 
+}
 
+fit.2<-selecao.pvalor(fit.inicial, alpha=0.05, steps = 1000)
 
-
-
-
-modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
-fit.inicial<-lm(modelo.completo, data=analise2.new)
-summary(fit.inicial)
-
-
-
-modelo.selecionado<-Y~dificuldade_motora+disfagia+sexo
-fit2<-lm(modelo.selecionado, data=analise2.new)
-summary(fit2)
 
 analise.res(fit2,1)
 
 
 
+#--------------------------Soma Cereais, pães e turbéculos---------
+
+Y<-get(somas.resp[[2]])
+
+modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+fit.inicial<-lm(modelo.completo, data=analise2.new)
+summary(fit.inicial)
+fit.2<-selecao.pvalor(fit.inicial, alpha=0.05, steps = 1000)
+
+#--------------------------Soma Cereais, pães e turbéculos saudáveis---------
+
+Y<-get(somas.resp[[3]])
+
+modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+fit.inicial<-lm(modelo.completo, data=analise2.new)
+summary(fit.inicial)
+
+fit.2<-selecao.pvalor(fit.inicial, alpha=0.05, steps = 1000)
 
 
+#--------------------------Soma verduras e legumes---------
+
+Y<-get(somas.resp[[4]])
+Analise.exp(Y,nome.plot=names(somas.resp)[[4]])
+
+modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+fit.inicial<-lm(modelo.completo, data=analise2.new)
+summary(fit.inicial)
+
+fit.2<-selecao.pvalor(fit.inicial, alpha=0.05, steps = 1000)
+# Com a paralisia cerebral o resíduo da observação 23 é infito. Só uma observação tem essa caract
+modelo.selecionado<-Y~di+dificuldade_motora+constipacao+sexo
+fit2<-lm(modelo.selecionado, data=analise2.new)
+summary(fit2)
 
 
+#------------------- Frutas------------------
+Y<-get(somas.resp[[5]])
 
+modelo.completo<-Y~tea+di+tdah+dificuldade_motora+disfagia+epilepsia_farmacorressistente+tipo_focal_generalizada+rec_vomito_diarreia+constipacao+etiologia+paralisia_cerebral+atraso_desenvolvimento_sn+idade_atual_anos+sexo
+fit.inicial<-lm(modelo.completo, data=analise2.new)
+summary(fit.inicial)
+
+fit.2<-selecao.pvalor(fit.inicial, alpha=0.05, steps = 1000)
