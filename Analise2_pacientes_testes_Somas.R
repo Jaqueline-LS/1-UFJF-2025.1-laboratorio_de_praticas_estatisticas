@@ -12,7 +12,7 @@ cores<-c("#FF9B95","#C9E69E","#BAF3DE","#FFC29A")
 
 
 # Consumo adequado ou inadequado de verduras e legumes
-variaveis<-colnames(analise2.new)[c(2:11)]
+variaveis<-colnames(analise2.new)[c(1:15)]
 attach(analise2.new)
 
 teste.mood.p<-numeric(length(variaveis)+2)

@@ -1,0 +1,77 @@
+---
+title: "Análise Extra - Regressão Linear"
+author: "Jaqueline Lamas da Silva"
+date: "2026-05-13"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("dados.R")
+suppressMessages(library("readr"))
+suppressMessages(library("glmnet"))
+suppressMessages(library("car"))
+suppressMessages(attach(analise2.new))
+
+
+lasso<-function(y)
+{
+    X <- model.matrix(
+      y ~ idade_atual_anos + sexo + idade_1a_crise_meses + tea + di + tdah + dificuldade_motora + 
+        disfagia + rec_vomito_diarreia + constipacao + atraso_desenvolvimento_sn +
+        epilepsia_farmacorressistente+ tipo_focal_generalizada + etiologia
+      ,
+      data = analise2.new
+    )[,-1]
+
+    penalty <- rep(1, ncol(X))
+    penalty[colnames(X) == "idade_atual_anos"] <- 0
+    penalty[colnames(X) == "sexoM"] <- 0
+    
+    set.seed(123)
+    cvfit <- cv.glmnet(
+      X,
+      y,
+      alpha = 1, #1  LASSO
+      penalty.factor = penalty,
+      standardize = TRUE
+    )
+    return(cvfit)
+}
+
+```
+
+## Distribuição de cada condição clínica na população
+```{r }
+t(summary(analise2.new[,c(2:13,15)]))
+```
+
+## Vegetables
+
+### Lambda min:
+```{r}
+y<-analise2.new$soma_porcoes_dia_verduras_legumes
+cvfit<-lasso(y)
+```
+* O lambda mínimo é: `r cvfit$lambda.min`.
+
+### Coeficientes:
+```{r}
+betas<-coef(cvfit, s = "lambda.min")
+betas
+```
+
+### Refit do modelo:
+```{r}
+ajuste.min<-lm(y~idade_atual_anos+sexo+tdah+dificuldade_motora+disfagia, data = analise2.new)
+summary(ajuste.min)
+```
+
+## Lambda 1se:
+* O lambda.1se é: `r cvfit$lambda.1se`. E os coeficientes associados são:
+```{r}
+coef(cvfit, s = "lambda.1se")
+```
+
+
+
