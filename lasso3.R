@@ -3,7 +3,6 @@ library("readr")
 library("glmnet")
 library("car")
 
-# Consumo adequado ou inadequado de verduras e legumes
 attach(analise2.new)
 
 t(summary(analise2.new[,c(2:13,15)]))
@@ -159,9 +158,10 @@ tabela
 
 
 ajuste.min<-lm(fruits~idade_atual_anos + sexo + 
-  tdah + atraso_desenvolvimento_sn)
+  tdah + atraso_desenvolvimento_sn+dificuldade_motora)
 summary(ajuste.min)
 
-
+ajuste.min<-lm(fruits~idade_atual_anos + sexo  + atraso_desenvolvimento_sn+dificuldade_motora)
+summary(ajuste.min)
 
 
