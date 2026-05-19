@@ -213,3 +213,46 @@ tabela.final<-tabela.pvalor(covariaveis.clinicas)
 print(tabela.final)
 ```
 
+
+## Sugary Snacks
+
+```{r}
+adeq_porcoes_dia_doces_salgadinhos_guloseimas
+y=adeq_porcoes_dia_doces_salgadinhos_guloseimas=="I" # inadequação
+table(y)
+```
+
+```{r}
+tabela.final<-tabela.pvalor(covariaveis.clinicas)
+```
+
+```{r, results='asis'}
+print(tabela.final)
+```
+
+
+```{r}
+modelo<-logistf(y ~ idade_atual_anos + sexo  + tipo_focal_generalizada + etiologia +constipacao)
+ajuste(modelo)
+
+summary(modelo)
+```
+```{r}
+table(y, tipo_focal_generalizada)
+```
+```{r}
+table(y, etiologia)
+```
+```{r}
+modelo<-logistf(y ~ idade_atual_anos + sexo  + tipo_focal_generalizada + etiologia)
+ajuste(modelo)
+
+summary(modelo)
+```
+```{r}
+modelo<-logistf(y ~ idade_atual_anos + sexo  + tipo_focal_generalizada)
+ajuste(modelo)
+```
+
+
+
