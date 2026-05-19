@@ -20,29 +20,48 @@ covariaveis.clinicas.frequentes<-c("idade_1a_crise_meses", "tea", "di",
   "tipo_focal_generalizada", "etiologia")
 
 get(covariaveis.clinicas.frequentes[1])
-p.valores<-numeric(length(covariaveis.clinicas.frequentes))
-for(i in seq_along(covariaveis.clinicas.frequentes))
+
+tabela.pvalor<-function(covariaveis.clinicas.frequentes)
 {
-  modelo<-logistf(y ~ idade_atual_anos + sexo + get(covariaveis.clinicas.frequentes[i]))
-  resumo<-summary(modelo)
-  p.valores[i]<-resumo$prob[4]
+
+    p.valores<-numeric(length(covariaveis.clinicas.frequentes))
+    for(i in seq_along(covariaveis.clinicas.frequentes))
+    {
+      modelo<-logistf(y ~ idade_atual_anos + sexo + get(covariaveis.clinicas.frequentes[i]))
+      resumo<-summary(modelo)
+      p.valores[i]<-resumo$prob[4]
+      erros.padrao<-sqrt(diag(resumo$var))
+      coeficientes<-resumo$coefficients
+      c1<-exp(coeficientes)
+      c2<-exp(coeficientes-(1.96*erros.padrao))
+      c3<-exp(coeficientes+(1.96*erros.padrao))
+      tabela2<-data.frame(c1,c2,c3)
+      colnames(tabela2)<-c("OR","LI", "LS")
+      cat("\n\nTabela ODDS ", covariaveis.clinicas.frequentes[i],"\n")
+      print(tabela2)
+      cat("\n")
+    }
+    table(y)
+    tabela<-data_frame(covariaveis.clinicas.frequentes,p.valores)
+    tabela |>
+      arrange(p.valores)
+    
+
 }
-table(y)
-tabela<-data_frame(covariaveis.clinicas.frequentes,p.valores)
-tabela |>
-  arrange(p.valores)
+tabela.pvalor(covariaveis.clinicas)
+
 
 modelo.final<-logistf(y ~idade_atual_anos + sexo + constipacao+
-                        tea + dificuldade_motora + di)
+                            tea + dificuldade_motora + di)
 resumo<-summary(modelo.final)
-
+    
 erros.padrao<-sqrt(diag(resumo$var))
 coeficientes<-resumo$coefficients
-
+    
 c1<-exp(coeficientes)
 c2<-exp(coeficientes-(1.96*erros.padrao))
 c3<-exp(coeficientes+(1.96*erros.padrao))
-
+    
 tabela2<-data.frame(c1,c2,c3)
 colnames(tabela2)<-c("OR","LI", "LS")
 tabela2
@@ -51,7 +70,7 @@ tabela2
 # 
 
 
-
+table(y,constipacao)
 
 y<-adeq_porcoes_semana_doces_salgadinhos_guloseimas=="I" # inadequação
 table(y)
