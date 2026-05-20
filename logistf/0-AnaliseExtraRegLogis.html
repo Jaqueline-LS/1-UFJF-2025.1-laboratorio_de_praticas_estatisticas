@@ -1089,6 +1089,747 @@ tea
 </tr>
 </tbody>
 </table>
+<p>Fazer o ajuste com <strong>di e atraso_desenvolvimento</strong>. A
+variável rec_vomito_diarreia possui poucos casos, o IC é muito
+grande.</p>
+<pre class="r"><code>modelo&lt;-logistf(y ~ idade_atual_anos + sexo  + di + atraso_desenvolvimento_sn )
+ajuste(modelo)</code></pre>
+<pre><code>## 
+## 
+## Tabela ODDS 
+##                                OR     LI      LS  (LS/LI) P-valor
+## (Intercept)                0.2509 0.0164  3.1130 189.8171  0.2834
+## idade_atual_anos           0.9777 0.8207  1.1580   1.4110  0.7927
+## sexoM                      3.4379 0.8425 16.7500  19.8813  0.0863
+## diS                        2.0105 0.3057 14.8090  48.4429  0.4659
+## atraso_desenvolvimento_snS 2.4865 0.3546 19.8197  55.8931  0.3600</code></pre>
+<pre class="r"><code>summary(modelo)</code></pre>
+<pre><code>## logistf(formula = y ~ idade_atual_anos + sexo + di + atraso_desenvolvimento_sn)
+## 
+## Model fitted by Penalized ML
+## Coefficients:
+##                                  coef   se(coef) lower 0.95 upper 0.95
+## (Intercept)                -1.3828952 1.29784460 -4.1109946  1.1355866
+## idade_atual_anos           -0.0225678 0.08496249 -0.1975431  0.1467147
+## sexoM                       1.2348667 0.73975547 -0.1713412  2.8183995
+## diS                         0.6983592 0.95483733 -1.1850232  2.6952334
+## atraso_desenvolvimento_snS  0.9108680 0.99627428 -1.0368160  2.9866741
+##                                Chisq          p method
+## (Intercept)                1.1505036 0.28344376      2
+## idade_atual_anos           0.0690499 0.79272518      2
+## sexoM                      2.9427193 0.08626539      2
+## diS                        0.5316861 0.46589885      2
+## atraso_desenvolvimento_snS 0.8378779 0.36000440      2
+## 
+## Method: 1-Wald, 2-Profile penalized log-likelihood, 3-None
+## 
+## Likelihood ratio test=5.266459 on 4 df, p=0.2610332, n=37
+## Wald test = 4.641878 on 4 df, p = 0.3260543</code></pre>
+<pre class="r"><code>modelo&lt;-logistf(y ~ idade_atual_anos + sexo  + atraso_desenvolvimento_sn)
+ajuste(modelo)</code></pre>
+<pre><code>## 
+## 
+## Tabela ODDS 
+##                                OR     LI      LS  (LS/LI) P-valor
+## (Intercept)                0.1858 0.0128  2.0578 160.7656  0.1724
+## idade_atual_anos           1.0087 0.8707  1.1712   1.3451  0.9067
+## sexoM                      3.4146 0.8381 16.1228  19.2373  0.0876
+## atraso_desenvolvimento_snS 3.9707 0.8486 22.8937  26.9782  0.0808</code></pre>
+<pre class="r"><code>summary(modelo)</code></pre>
+<pre><code>## logistf(formula = y ~ idade_atual_anos + sexo + atraso_desenvolvimento_sn)
+## 
+## Model fitted by Penalized ML
+## Coefficients:
+##                                   coef   se(coef) lower 0.95 upper 0.95
+## (Intercept)                -1.68308564 1.25676526 -4.3600611  0.7216292
+## idade_atual_anos            0.00866922 0.07346027 -0.1384021  0.1580248
+## sexoM                       1.22804919 0.73700523 -0.1766422  2.7802325
+## atraso_desenvolvimento_snS  1.37895466 0.81578899 -0.1641856  3.1308635
+##                                 Chisq          p method
+## (Intercept)                1.86168437 0.17243053      2
+## idade_atual_anos           0.01372198 0.90674843      2
+## sexoM                      2.91880718 0.08755256      2
+## atraso_desenvolvimento_snS 3.04823715 0.08082483      2
+## 
+## Method: 1-Wald, 2-Profile penalized log-likelihood, 3-None
+## 
+## Likelihood ratio test=4.870518 on 3 df, p=0.1815277, n=37
+## Wald test = 4.439789 on 3 df, p = 0.2177243</code></pre>
+<pre class="r"><code>modelo&lt;-logistf(y ~ idade_atual_anos + sexo  + di )
+ajuste(modelo)</code></pre>
+<pre><code>## 
+## 
+## Tabela ODDS 
+##                      OR     LI      LS (LS/LI) P-valor
+## (Intercept)      0.5354 0.0635  3.7185 58.5591  0.5296
+## idade_atual_anos 0.9507 0.8035  1.1140  1.3864  0.5325
+## sexoM            3.0924 0.7749 14.6705 18.9321  0.1114
+## diS              3.4301 0.7896 18.9161 23.9566  0.1022</code></pre>
+<pre class="r"><code>summary(modelo)</code></pre>
+<pre><code>## logistf(formula = y ~ idade_atual_anos + sexo + di)
+## 
+## Model fitted by Penalized ML
+## Coefficients:
+##                         coef   se(coef) lower 0.95 upper 0.95     Chisq
+## (Intercept)      -0.62475218 0.99914726 -2.7572532  1.3133231 0.3952266
+## idade_atual_anos -0.05053601 0.08054941 -0.2187644  0.1079201 0.3896869
+## sexoM             1.12894508 0.72800536 -0.2549998  2.6858418 2.5336756
+## diS               1.23260304 0.78305630 -0.2362067  2.9400130 2.6705767
+##                          p method
+## (Intercept)      0.5295648      2
+## idade_atual_anos 0.5324640      2
+## sexoM            0.1114404      2
+## diS              0.1022190      2
+## 
+## Method: 1-Wald, 2-Profile penalized log-likelihood, 3-None
+## 
+## Likelihood ratio test=4.497628 on 3 df, p=0.212502, n=37
+## Wald test = 4.017605 on 3 df, p = 0.2595694</code></pre>
+</div>
+<div id="laticinios" class="section level2">
+<h2>Laticinios</h2>
+<pre class="r"><code>adeq_porcoes_dia_laticinios</code></pre>
+<pre><code>##  [1] A I A I A A A I I I I I I I A A A I A I I A A A A A I I A A A I I A I A A
+## Levels: A I</code></pre>
+<pre class="r"><code>y=adeq_porcoes_dia_laticinios==&quot;I&quot; # inadequação
+table(y)</code></pre>
+<pre><code>## y
+## FALSE  TRUE 
+##    20    17</code></pre>
+<pre class="r"><code>tabela.final&lt;-tabela.pvalor(covariaveis.clinicas)</code></pre>
+<pre><code>## 
+## 
+## Tabela ODDS  idade_1a_crise_meses 
+##                                                OR         LI       LS
+## (Intercept)                             0.5675117 0.07252646 3.988910
+## idade_atual_anos                        1.1067194 0.95292095 1.303698
+## sexoM                                   0.3165122 0.07245689 1.255486
+## get(covariaveis.clinicas.frequentes[i]) 1.0023161 0.97709051 1.031296
+## 
+##  Tamanho do intervalo (LS/LI):  1.055477 
+## 
+## 
+## 
+## Tabela ODDS  tea 
+##                                                 OR         LI       LS
+## (Intercept)                              0.6677267 0.07016058 6.216916
+## idade_atual_anos                         1.1065858 0.95531839 1.300416
+## sexoM                                    0.3109846 0.07019990 1.253214
+## get(covariaveis.clinicas.frequentes[i])S 0.8505765 0.19958592 3.387364
+## 
+##  Tamanho do intervalo (LS/LI):  16.97196 
+## 
+## 
+## 
+## Tabela ODDS  di 
+##                                                 OR         LI       LS
+## (Intercept)                              0.6039186 0.07812286 4.258231
+## idade_atual_anos                         1.1151545 0.95212374 1.327601
+## sexoM                                    0.3171182 0.07503085 1.241622
+## get(covariaveis.clinicas.frequentes[i])S 0.8702779 0.18270442 3.713570
+## 
+##  Tamanho do intervalo (LS/LI):  20.32556 
+## 
+## 
+## 
+## Tabela ODDS  tdah 
+##                                                 OR         LI        LS
+## (Intercept)                              0.5969441 0.07837849  4.171328
+## idade_atual_anos                         1.1087032 0.95739532  1.302671
+## sexoM                                    0.3153592 0.07219439  1.284189
+## get(covariaveis.clinicas.frequentes[i])S 1.1533884 0.08863379 11.017451
+## 
+##  Tamanho do intervalo (LS/LI):  124.3031 
+## 
+## 
+## 
+## Tabela ODDS  dificuldade_motora 
+##                                                 OR         LI       LS
+## (Intercept)                              0.5287386 0.06621343 3.894265
+## idade_atual_anos                         1.1046717 0.95302078 1.298156
+## sexoM                                    0.3419737 0.08176237 1.344173
+## get(covariaveis.clinicas.frequentes[i])S 1.3175039 0.31329669 5.366178
+## 
+##  Tamanho do intervalo (LS/LI):  17.1281 
+## 
+## 
+## 
+## Tabela ODDS  disfagia 
+##                                                 OR         LI       LS
+## (Intercept)                              0.6818431 0.08758701 5.021011
+## idade_atual_anos                         1.1120312 0.95863915 1.309182
+## sexoM                                    0.2984726 0.06837893 1.182096
+## get(covariaveis.clinicas.frequentes[i])S 0.3586846 0.02888983 2.667459
+## 
+##  Tamanho do intervalo (LS/LI):  92.33212 
+## 
+## 
+## 
+## Tabela ODDS  rec_vomito_diarreia 
+##                                                  OR          LI        LS
+## (Intercept)                              0.99841169 0.123779537 8.7216057
+## idade_atual_anos                         1.09951901 0.941464206 1.3003304
+## sexoM                                    0.21775676 0.043157790 0.9368274
+## get(covariaveis.clinicas.frequentes[i])S 0.07597792 0.000500337 1.1297629
+## 
+##  Tamanho do intervalo (LS/LI):  2258.004 
+## 
+## 
+## 
+## Tabela ODDS  constipacao 
+##                                                 OR         LI       LS
+## (Intercept)                              0.5722921 0.07474582 3.944597
+## idade_atual_anos                         1.1202973 0.96015565 1.328809
+## sexoM                                    0.3209746 0.07801245 1.236817
+## get(covariaveis.clinicas.frequentes[i])S 0.7164267 0.12410381 3.774963
+## 
+##  Tamanho do intervalo (LS/LI):  30.41778 
+## 
+## 
+## 
+## Tabela ODDS  atraso_desenvolvimento_sn 
+##                                                 OR         LI       LS
+## (Intercept)                              0.7292086 0.05863520 8.425579
+## idade_atual_anos                         1.1063710 0.95529843 1.300106
+## sexoM                                    0.3104544 0.07081301 1.241986
+## get(covariaveis.clinicas.frequentes[i])S 0.8043338 0.15610352 4.055897
+## 
+##  Tamanho do intervalo (LS/LI):  25.9821 
+## 
+## 
+## 
+## Tabela ODDS  epilepsia_farmacorressistente 
+##                                                 OR         LI        LS
+## (Intercept)                              0.3372581 0.02560504  3.117205
+## idade_atual_anos                         1.0970997 0.94170415  1.295282
+## sexoM                                    0.3537573 0.08451979  1.419029
+## get(covariaveis.clinicas.frequentes[i])S 2.2535442 0.45792858 14.001728
+## 
+##  Tamanho do intervalo (LS/LI):  30.57623 
+## 
+## 
+## 
+## Tabela ODDS  tipo_focal_generalizada 
+##                                                 OR         LI       LS
+## (Intercept)                              0.5323974 0.06706880 3.773590
+## idade_atual_anos                         1.1005056 0.94534743 1.297161
+## sexoM                                    0.3532501 0.08441328 1.404220
+## get(covariaveis.clinicas.frequentes[i])G 1.5863581 0.31254663 8.393093
+## 
+##  Tamanho do intervalo (LS/LI):  26.85389 
+## 
+## 
+## 
+## Tabela ODDS  etiologia 
+##                                                 OR         LI       LS
+## (Intercept)                              0.8979261 0.08775779 9.355493
+## idade_atual_anos                         1.0916682 0.94062755 1.281434
+## sexoM                                    0.3475606 0.07779284 1.438339
+## get(covariaveis.clinicas.frequentes[i])G 0.8071403 0.15414009 3.955947
+## get(covariaveis.clinicas.frequentes[i])I 0.3832764 0.05424080 2.158425
+## 
+##  Tamanho do intervalo (LS/LI):  25.66462 
+## 
+## y
+## FALSE  TRUE 
+##    20    17 
+## 
+##  rec_vomito_diarreia 
+##        
+## y        N  S
+##   FALSE 17  3
+##   TRUE  17  0</code></pre>
+<pre class="r"><code>print(tabela.final)</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+covariaveis.clinicas.frequentes
+</th>
+<th style="text-align:right;">
+p.valores
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;background-color: rgba(240, 248, 255, 255) !important;">
+rec_vomito_diarreia
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(240, 248, 255, 255) !important;">
+0.0628653
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+epilepsia_farmacorressistente
+</td>
+<td style="text-align:right;">
+0.3227608
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+disfagia
+</td>
+<td style="text-align:right;">
+0.3258258
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tipo_focal_generalizada
+</td>
+<td style="text-align:right;">
+0.5719241
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+constipacao
+</td>
+<td style="text-align:right;">
+0.6930906
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dificuldade_motora
+</td>
+<td style="text-align:right;">
+0.7000015
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+atraso_desenvolvimento_sn
+</td>
+<td style="text-align:right;">
+0.7887347
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+etiologia
+</td>
+<td style="text-align:right;">
+0.7909542
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tea
+</td>
+<td style="text-align:right;">
+0.8191260
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+di
+</td>
+<td style="text-align:right;">
+0.8535092
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+idade_1a_crise_meses
+</td>
+<td style="text-align:right;">
+0.8581834
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tdah
+</td>
+<td style="text-align:right;">
+0.9022236
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="sugary-snacks" class="section level2">
+<h2>Sugary Snacks</h2>
+<pre class="r"><code>adeq_porcoes_dia_doces_salgadinhos_guloseimas</code></pre>
+<pre><code>##  [1] A I I I A A I I I A I I I A I I I A I I A I I A I I I A I I I A A A A I I
+## Levels: A I</code></pre>
+<pre class="r"><code>y=adeq_porcoes_dia_doces_salgadinhos_guloseimas==&quot;I&quot; # inadequação
+table(y)</code></pre>
+<pre><code>## y
+## FALSE  TRUE 
+##    13    24</code></pre>
+<pre class="r"><code>tabela.final&lt;-tabela.pvalor(covariaveis.clinicas)</code></pre>
+<pre><code>## 
+## 
+## Tabela ODDS  idade_1a_crise_meses 
+##                                                OR         LI       LS
+## (Intercept)                             0.6015069 0.07968993 4.121893
+## idade_atual_anos                        1.0685668 0.92387309 1.249822
+## sexoM                                   1.5755987 0.38024529 6.604398
+## get(covariaveis.clinicas.frequentes[i]) 1.0055365 0.98085511 1.036086
+## 
+##  Tamanho do intervalo (LS/LI):  1.056309 
+## 
+## 
+## 
+## Tabela ODDS  tea 
+##                                                 OR         LI       LS
+## (Intercept)                              0.6370625 0.06665852 5.649476
+## idade_atual_anos                         1.0746292 0.93111689 1.253551
+## sexoM                                    1.6653015 0.40805679 7.134684
+## get(covariaveis.clinicas.frequentes[i])S 0.9921387 0.25524728 3.901767
+## 
+##  Tamanho do intervalo (LS/LI):  15.28622 
+## 
+## 
+## 
+## Tabela ODDS  di 
+##                                                 OR         LI       LS
+## (Intercept)                              0.6160939 0.08051131 4.256362
+## idade_atual_anos                         1.0661820 0.91462845 1.257856
+## sexoM                                    1.7130746 0.43337600 7.188790
+## get(covariaveis.clinicas.frequentes[i])S 1.1962618 0.27139988 5.201326
+## 
+##  Tamanho do intervalo (LS/LI):  19.16481 
+## 
+## 
+## 
+## Tabela ODDS  tdah 
+##                                                 OR         LI         LS
+## (Intercept)                              0.6492557 0.08524014   4.529972
+## idade_atual_anos                         1.0732440 0.92825497   1.254285
+## sexoM                                    1.3630267 0.33739663   5.744613
+## get(covariaveis.clinicas.frequentes[i])S 4.0541172 0.31925272 575.835369
+## 
+##  Tamanho do intervalo (LS/LI):  1803.698 
+## 
+## 
+## 
+## Tabela ODDS  dificuldade_motora 
+##                                                 OR         LI       LS
+## (Intercept)                              0.7870741 0.09994018 5.771767
+## idade_atual_anos                         1.0831380 0.93746105 1.268879
+## sexoM                                    1.4747885 0.35920833 6.194709
+## get(covariaveis.clinicas.frequentes[i])S 0.5714509 0.13574718 2.317731
+## 
+##  Tamanho do intervalo (LS/LI):  17.07388 
+## 
+## 
+## 
+## Tabela ODDS  disfagia 
+##                                                 OR         LI       LS
+## (Intercept)                              0.6906006 0.09221048 4.799834
+## idade_atual_anos                         1.0765373 0.93174118 1.258020
+## sexoM                                    1.6185176 0.41491345 6.577549
+## get(covariaveis.clinicas.frequentes[i])S 0.5249716 0.07120850 3.864234
+## 
+##  Tamanho do intervalo (LS/LI):  54.26647 
+## 
+## 
+## 
+## Tabela ODDS  rec_vomito_diarreia 
+##                                                OR        LI         LS
+## (Intercept)                              0.418388 0.0444562   3.101800
+## idade_atual_anos                         1.090712 0.9429462   1.281223
+## sexoM                                    2.100541 0.5068951   9.736451
+## get(covariaveis.clinicas.frequentes[i])S 6.213523 0.4954167 902.451432
+## 
+##  Tamanho do intervalo (LS/LI):  1821.601 
+## 
+## 
+## 
+## Tabela ODDS  constipacao 
+##                                                 OR         LI       LS
+## (Intercept)                              0.5724886 0.06905778 4.024189
+## idade_atual_anos                         1.1161151 0.95429816 1.337518
+## sexoM                                    1.6650952 0.41508863 7.051055
+## get(covariaveis.clinicas.frequentes[i])S 0.3236804 0.05307198 1.709109
+## 
+##  Tamanho do intervalo (LS/LI):  32.2036 
+## 
+## 
+## 
+## Tabela ODDS  atraso_desenvolvimento_sn 
+##                                                 OR         LI        LS
+## (Intercept)                              1.0708317 0.09145883 13.483728
+## idade_atual_anos                         1.0718358 0.92754608  1.252279
+## sexoM                                    1.4888386 0.36479871  6.276527
+## get(covariaveis.clinicas.frequentes[i])S 0.5674883 0.09132198  2.696315
+## 
+##  Tamanho do intervalo (LS/LI):  29.52537 
+## 
+## 
+## 
+## Tabela ODDS  epilepsia_farmacorressistente 
+##                                                 OR         LI        LS
+## (Intercept)                              1.0511290 0.11480497 10.664505
+## idade_atual_anos                         1.0942882 0.94297134  1.288330
+## sexoM                                    1.5245628 0.37895910  6.328210
+## get(covariaveis.clinicas.frequentes[i])S 0.4402733 0.06598779  2.174688
+## 
+##  Tamanho do intervalo (LS/LI):  32.95592 
+## 
+## 
+## 
+## Tabela ODDS  tipo_focal_generalizada 
+##                                                 OR         LI        LS
+## (Intercept)                              0.7402588 0.07908286 6.1524474
+## idade_atual_anos                         1.1497260 0.97493517 1.3965975
+## sexoM                                    1.1471257 0.22741229 5.4478092
+## get(covariaveis.clinicas.frequentes[i])G 0.1196066 0.01492480 0.6592974
+## 
+##  Tamanho do intervalo (LS/LI):  44.17463 
+## 
+## 
+## 
+## Tabela ODDS  etiologia 
+##                                                 OR        LI         LS
+## (Intercept)                              1.6570398 0.1422082 21.1870064
+## idade_atual_anos                         1.0690080 0.9175793  1.2646142
+## sexoM                                    1.0057772 0.1953428  4.6603554
+## get(covariaveis.clinicas.frequentes[i])G 0.2017532 0.0344235  0.9630971
+## get(covariaveis.clinicas.frequentes[i])I 0.9887662 0.1532145  7.2162245
+## 
+##  Tamanho do intervalo (LS/LI):  27.97789 
+## 
+## y
+## FALSE  TRUE 
+##    13    24 
+## 
+##  rec_vomito_diarreia 
+##        
+## y        N  S
+##   FALSE 13  0
+##   TRUE  21  3
+## 
+##  constipacao 
+##        
+## y        N  S
+##   FALSE  9  4
+##   TRUE  20  4
+## 
+##  tipo_focal_generalizada 
+##        
+## y        F  G
+##   FALSE  7  6
+##   TRUE  21  3
+## 
+##  etiologia 
+##        
+## y        E  G  I
+##   FALSE  3  8  2
+##   TRUE  12  5  7</code></pre>
+<pre class="r"><code>print(tabela.final)</code></pre>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+covariaveis.clinicas.frequentes
+</th>
+<th style="text-align:right;">
+p.valores
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;font-weight: bold;background-color: rgba(240, 248, 255, 255) !important;">
+tipo_focal_generalizada
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(240, 248, 255, 255) !important;">
+0.0137506
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;background-color: rgba(240, 248, 255, 255) !important;">
+etiologia
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(240, 248, 255, 255) !important;">
+0.0446072
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;background-color: rgba(240, 248, 255, 255) !important;">
+rec_vomito_diarreia
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(240, 248, 255, 255) !important;">
+0.1768201
+</td>
+</tr>
+<tr>
+<td style="text-align:left;font-weight: bold;background-color: rgba(240, 248, 255, 255) !important;">
+constipacao
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(240, 248, 255, 255) !important;">
+0.1838176
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tdah
+</td>
+<td style="text-align:right;">
+0.3145728
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+epilepsia_farmacorressistente
+</td>
+<td style="text-align:right;">
+0.3249075
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dificuldade_motora
+</td>
+<td style="text-align:right;">
+0.4306041
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+atraso_desenvolvimento_sn
+</td>
+<td style="text-align:right;">
+0.4866592
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+disfagia
+</td>
+<td style="text-align:right;">
+0.5085594
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+idade_1a_crise_meses
+</td>
+<td style="text-align:right;">
+0.6668202
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+di
+</td>
+<td style="text-align:right;">
+0.8085098
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tea
+</td>
+<td style="text-align:right;">
+0.9908175
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>modelo&lt;-logistf(y ~ idade_atual_anos + sexo  + tipo_focal_generalizada + etiologia +constipacao)
+ajuste(modelo)</code></pre>
+<pre><code>## 
+## 
+## Tabela ODDS 
+##                              OR     LI      LS  (LS/LI) P-valor
+## (Intercept)              3.0748 0.2306 46.5388 201.8161  0.3878
+## idade_atual_anos         1.1841 0.9870  1.4801   1.4996  0.0699
+## sexoM                    0.4176 0.0458  2.5581  55.8537  0.3608
+## tipo_focal_generalizadaG 0.1265 0.0103  0.9142  88.7573  0.0401
+## etiologiaG               0.1165 0.0102  0.7820  76.6667  0.0257
+## etiologiaI               1.0318 0.1169  9.4177  80.5620  0.9767
+## constipacaoS             0.4164 0.0417  3.9650  95.0839  0.4341</code></pre>
+<pre class="r"><code>summary(modelo)</code></pre>
+<pre><code>## logistf(formula = y ~ idade_atual_anos + sexo + tipo_focal_generalizada + 
+##     etiologia + constipacao)
+## 
+## Model fitted by Penalized ML
+## Coefficients:
+##                                coef   se(coef)  lower 0.95  upper 0.95
+## (Intercept)               1.1232258 1.25640627 -1.46693896  3.84028605
+## idade_atual_anos          0.1689640 0.09466312 -0.01307651  0.39212494
+## sexoM                    -0.8733155 0.92997450 -3.08452759  0.93924661
+## tipo_focal_generalizadaG -2.0672408 1.03038335 -4.57988940 -0.08969432
+## etiologiaG               -2.1496117 1.00700031 -4.58097228 -0.24594323
+## etiologiaI                0.0312833 1.03558722 -2.14676987  2.24259031
+## constipacaoS             -0.8761096 1.06620960 -3.17770052  1.37751022
+##                                 Chisq          p method
+## (Intercept)              0.7457537675 0.38782395      2
+## idade_atual_anos         3.2842105925 0.06994926      2
+## sexoM                    0.8349862351 0.36083466      2
+## tipo_focal_generalizadaG 4.2125882053 0.04012507      2
+## etiologiaG               4.9760644192 0.02570038      2
+## etiologiaI               0.0008513091 0.97672326      2
+## constipacaoS             0.6119605031 0.43405060      2
+## 
+## Method: 1-Wald, 2-Profile penalized log-likelihood, 3-None
+## 
+## Likelihood ratio test=13.10876 on 6 df, p=0.04134104, n=37
+## Wald test = 9.974205 on 6 df, p = 0.1257425</code></pre>
+<pre class="r"><code>table(y, tipo_focal_generalizada)</code></pre>
+<pre><code>##        tipo_focal_generalizada
+## y        F  G
+##   FALSE  7  6
+##   TRUE  21  3</code></pre>
+<pre class="r"><code>table(y, etiologia)</code></pre>
+<pre><code>##        etiologia
+## y        E  G  I
+##   FALSE  3  8  2
+##   TRUE  12  5  7</code></pre>
+<pre class="r"><code>modelo&lt;-logistf(y ~ idade_atual_anos + sexo  + tipo_focal_generalizada + etiologia)
+ajuste(modelo)</code></pre>
+<pre><code>## 
+## 
+## Tabela ODDS 
+##                              OR     LI      LS  (LS/LI) P-valor
+## (Intercept)              3.0231 0.2141 45.4483 212.2760  0.4035
+## idade_atual_anos         1.1739 0.9797  1.4718   1.5023  0.0842
+## sexoM                    0.4122 0.0450  2.5470  56.6000  0.3557
+## tipo_focal_generalizadaG 0.0820 0.0071  0.5405  76.1268  0.0080
+## etiologiaG               0.1287 0.0108  0.8414  77.9074  0.0312
+## etiologiaI               1.1267 0.1343 10.2704  76.4736  0.9105</code></pre>
+<pre class="r"><code>summary(modelo)</code></pre>
+<pre><code>## logistf(formula = y ~ idade_atual_anos + sexo + tipo_focal_generalizada + 
+##     etiologia)
+## 
+## Model fitted by Penalized ML
+## Coefficients:
+##                                coef   se(coef) lower 0.95 upper 0.95      Chisq
+## (Intercept)               1.1062755 1.27817057  -1.541265  3.8165761 0.69778760
+## idade_atual_anos          0.1603150 0.09475975  -0.020467  0.3864575 2.98240572
+## sexoM                    -0.8862091 0.94217782  -3.100669  0.9349186 0.85292895
+## tipo_focal_generalizadaG -2.5010412 1.00971604  -4.954467 -0.6153356 7.03499189
+## etiologiaG               -2.0500554 1.00432537  -4.525807 -0.1726459 4.63923678
+## etiologiaI                0.1192508 1.02682902  -2.007418  2.3292656 0.01262585
+##                                    p method
+## (Intercept)              0.403528094      2
+## idade_atual_anos         0.084174074      2
+## sexoM                    0.355725070      2
+## tipo_focal_generalizadaG 0.007993224      2
+## etiologiaG               0.031248897      2
+## etiologiaI               0.910534141      2
+## 
+## Method: 1-Wald, 2-Profile penalized log-likelihood, 3-None
+## 
+## Likelihood ratio test=12.94979 on 5 df, p=0.02385384, n=37
+## Wald test = 9.436179 on 5 df, p = 0.09288102</code></pre>
+<pre class="r"><code>modelo&lt;-logistf(y ~ idade_atual_anos + sexo  + tipo_focal_generalizada)
+ajuste(modelo)</code></pre>
+<pre><code>## 
+## 
+## Tabela ODDS 
+##                              OR     LI     LS (LS/LI) P-valor
+## (Intercept)              0.7403 0.0791 6.1524 77.7800  0.7765
+## idade_atual_anos         1.1497 0.9749 1.3966  1.4326  0.0993
+## sexoM                    1.1471 0.2274 5.4478 23.9569  0.8618
+## tipo_focal_generalizadaG 0.1196 0.0149 0.6593 44.2483  0.0138</code></pre>
 </div>
 
 
