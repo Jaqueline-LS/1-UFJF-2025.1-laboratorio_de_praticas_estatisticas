@@ -743,6 +743,45 @@ table(y, constipacao)</code></pre>
 ## y        N  S
 ##   FALSE 11  7
 ##   TRUE  18  1</code></pre>
+<pre class="r"><code>ajuste(modelo)</code></pre>
+<pre><code>## 
+## 
+## Tabela ODDS 
+##                          OR     LI         LS   (LS/LI) P-valor
+## (Intercept)          1.4727 0.0085    72.1966 8493.7176  0.8416
+## idade_atual_anos     0.7977 0.5305     1.0346    1.9502  0.0936
+## sexoM               15.3036 1.5804  2113.1948 1337.1266  0.0144
+## teaS                 0.2389 0.0238     1.5058   63.2689  0.1295
+## constipacaoS         0.0428 0.0002     0.7679 3839.5000  0.0306
+## dificuldade_motoraS  0.2451 0.0099     2.9732  300.3232  0.2705
+## diS                 65.2915 3.4107 13646.4087 4001.0581  0.0020</code></pre>
+<pre class="r"><code>table(constipacao,di)</code></pre>
+<pre><code>##            di
+## constipacao  N  S
+##           N 18 11
+##           S  0  8</code></pre>
+<pre class="r"><code>fisher.test(table(constipacao,di))</code></pre>
+<pre><code>## 
+##  Fisher&#39;s Exact Test for Count Data
+## 
+## data:  table(constipacao, di)
+## p-value = 0.003091
+## alternative hypothesis: true odds ratio is not equal to 1
+## 95 percent confidence interval:
+##  2.175591      Inf
+## sample estimates:
+## odds ratio 
+##        Inf</code></pre>
+<pre class="r"><code>table(y, di)</code></pre>
+<pre><code>##        di
+## y        N  S
+##   FALSE  9  9
+##   TRUE   9 10</code></pre>
+<pre class="r"><code>table(y, dificuldade_motora)</code></pre>
+<pre><code>##        dificuldade_motora
+## y        N  S
+##   FALSE  8 10
+##   TRUE  15  4</code></pre>
 <p>Retirando constipacao.</p>
 <pre class="r"><code>modelo&lt;-logistf(y ~ idade_atual_anos + sexo  + tea + dificuldade_motora + di)
 ajuste(modelo)</code></pre>
@@ -780,40 +819,52 @@ ajuste(modelo)</code></pre>
 ## sexoM               3.1243 0.7395 14.3239  19.3697  0.1210
 ## teaS                0.2737 0.0545  1.2229  22.4385  0.0897
 ## dificuldade_motoraS 0.5233 0.1099  2.4996  22.7443  0.4087</code></pre>
-<p>Pensando em um modelo onde os IC são menores o modelo final seria
-esse:</p>
-<pre class="r"><code>modelo&lt;-logistf(y ~ idade_atual_anos + sexo  + tea  )
+<div id="vamos-ficar-com-o-modelo-y-idade_atual_anos-sexo-tea-di" class="section level3">
+<h3>Vamos ficar com o modelo <em>y ~ idade_atual_anos + sexo + tea
++di</em></h3>
+<pre class="r"><code>modelo&lt;-logistf(y ~ idade_atual_anos + sexo  + tea + di  )
 ajuste(modelo)</code></pre>
 <pre><code>## 
 ## 
 ## Tabela ODDS 
 ##                      OR     LI      LS  (LS/LI) P-valor
-## (Intercept)      3.1512 0.3016 37.1023 123.0182  0.3337
-## idade_atual_anos 0.9025 0.7577  1.0600   1.3990  0.2117
-## sexoM            3.3531 0.7837 15.6474  19.9661  0.1027
-## teaS             0.2170 0.0445  0.8985  20.1910  0.0348</code></pre>
+## (Intercept)      3.6763 0.2776 63.5600 228.9625  0.3249
+## idade_atual_anos 0.8180 0.6323  0.9976   1.5777  0.0471
+## sexoM            4.5973 0.9374 30.3939  32.4236  0.0604
+## teaS             0.1215 0.0151  0.6204  41.0861  0.0098
+## diS              6.4967 1.0320 69.8853  67.7183  0.0458</code></pre>
 <pre class="r"><code>summary(modelo)</code></pre>
-<pre><code>## logistf(formula = y ~ idade_atual_anos + sexo + tea)
+<pre><code>## logistf(formula = y ~ idade_atual_anos + sexo + tea + di)
 ## 
 ## Model fitted by Penalized ML
 ## Coefficients:
-##                        coef   se(coef) lower 0.95  upper 0.95     Chisq
-## (Intercept)       1.1477753 1.17840740 -1.1988004  3.61367818 0.9344602
-## idade_atual_anos -0.1026116 0.08201538 -0.2774886  0.05827707 1.5597589
-## sexoM             1.2098977 0.74438594 -0.2437736  2.75030406 2.6630675
-## teaS             -1.5278018 0.74370873 -3.1120834 -0.10707589 4.4544696
-##                           p method
-## (Intercept)      0.33370661      2
-## idade_atual_anos 0.21170052      2
-## sexoM            0.10270250      2
-## teaS             0.03481002      2
+##                        coef  se(coef)  lower 0.95  upper 0.95    Chisq
+## (Intercept)       1.3019187 1.2917895 -1.28166527  4.15198391 0.969199
+## idade_atual_anos -0.2008657 0.1059152 -0.45844623 -0.00237693 3.941227
+## sexoM             1.5254721 0.8259030 -0.06469478  3.41424266 3.527072
+## teaS             -2.1077917 0.8787409 -4.19483455 -0.47746002 6.666943
+## diS               1.8712916 0.9931013  0.03153216  4.24685524 3.987525
+##                            p method
+## (Intercept)      0.324880031      2
+## idade_atual_anos 0.047116387      2
+## sexoM            0.060374320      2
+## teaS             0.009821753      2
+## diS              0.045838362      2
 ## 
 ## Method: 1-Wald, 2-Profile penalized log-likelihood, 3-None
 ## 
-## Likelihood ratio test=11.10355 on 3 df, p=0.0111789, n=37
-## Wald test = 8.271794 on 3 df, p = 0.04071615</code></pre>
+## Likelihood ratio test=14.85537 on 4 df, p=0.005010781, n=37
+## Wald test = 9.3443 on 4 df, p = 0.05304674</code></pre>
 <p>A conclusão sobre o TEA é a mesma, a condição clínica TEA reduz a
-chance de ter um consumo inadequado de verduras.</p>
+chance de ter um consumo inadequado de verduras. A conclusão sobre
+Intellectual developmental disorder também é a mesma. Porém, os
+coeficientes estão mais estáveis. Olhando pela razão entre o LS e o LI
+conseguimos ter uma noção melhor sobre a amplitude do intervalo, antes a
+amplitude do intervalo para a covariável di era 329.7878788 e para a
+variável tea era 82.5. As covariáveis constipation e di parecem
+apresentar uma associação e como a constipação só apresenta um caso em
+uma das células achei que fizesse mais sentido manter di.</p>
+</div>
 </div>
 <div id="frutas" class="section level2">
 <h2>Frutas</h2>

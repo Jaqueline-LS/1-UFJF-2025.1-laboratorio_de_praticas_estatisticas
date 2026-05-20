@@ -124,6 +124,15 @@ ajuste<-function(modelo)
 }
 
 table(y, constipacao)
+ajuste(modelo)
+```
+
+```{r}
+table(constipacao,di)
+fisher.test(table(constipacao,di))
+
+table(y, di)
+table(y, dificuldade_motora)
 
 ```
 
@@ -143,17 +152,16 @@ Retirando di
 ```{r}
 modelo<-logistf(y ~ idade_atual_anos + sexo  + tea  + dificuldade_motora)
 ajuste(modelo)
-
 ```
 
-Pensando em um modelo onde os IC são menores o modelo final seria esse:
+### Vamos ficar com o modelo *y ~ idade_atual_anos + sexo  + tea +di*
 ```{r}
-modelo<-logistf(y ~ idade_atual_anos + sexo  + tea  )
+modelo<-logistf(y ~ idade_atual_anos + sexo  + tea + di  )
 ajuste(modelo)
 
 summary(modelo)
 ```
-A conclusão sobre o TEA é a mesma, a condição clínica TEA reduz a chance de ter um consumo inadequado de verduras.
+A conclusão sobre o TEA é a mesma, a condição clínica TEA reduz a chance de ter um consumo inadequado de verduras. A conclusão sobre Intellectual developmental disorder também é a mesma. Porém, os coeficientes estão mais estáveis. Olhando pela razão entre o LS e o LI conseguimos ter uma noção melhor sobre a amplitude do intervalo, antes a amplitude do intervalo para a covariável di era `r 544.15/1.65 ` e para a variável tea era `r 0.66/0.008`. As covariáveis constipation e di parecem apresentar uma associação e como a constipação só apresenta um caso em uma das células achei que fizesse mais sentido manter di. 
 
 
 ## Frutas
