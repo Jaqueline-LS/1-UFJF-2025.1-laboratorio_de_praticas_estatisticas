@@ -358,6 +358,15 @@ table(etiologia, tipo_focal_generalizada)
 fisher.test(table(etiologia, tipo_focal_generalizada))
 
 
+
+table(sexo, tipo_focal_generalizada)
+fisher.test(table(sexo, tipo_focal_generalizada))
+
+
+table(sexo, etiologia)
+fisher.test(table(sexo, etiologia))
+
+
 ```
 
 
@@ -370,7 +379,6 @@ table(y, etiologia)
 ```{r}
 modelo<-logistf(y ~ idade_atual_anos + sexo  + tipo_focal_generalizada + etiologia)
 ajuste(modelo)
-
 summary(modelo)
 ```
 
