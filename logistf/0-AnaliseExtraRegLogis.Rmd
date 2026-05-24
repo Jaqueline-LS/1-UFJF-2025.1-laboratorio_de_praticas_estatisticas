@@ -19,20 +19,8 @@ source("C:/ufjf/2025.1/laboratorio_de_praticas_estatisticas/dados.R")
 library("logistf")
 library("kableExtra")
 suppressMessages(library("dplyr"))
-
 suppressMessages(attach(analise2.new))
-```
 
-## Verduras e Legumes
-
-```{r}
-y<-adeq_porcoes_dia_verduras_legumes=="I" # inadequação
-table(y)
-```
-19 eventos do desfecho.
-
-```{r, warning=FALSE}
-t(summary(analise2.new[,c(2:13,15)]))
 
 covariaveis.clinicas<-c("idade_1a_crise_meses", "tea", "di", "tdah", 
   "dificuldade_motora", "disfagia", "rec_vomito_diarreia", "constipacao", 
@@ -91,18 +79,7 @@ tabela.pvalor<-function(covariaveis.clinicas.frequentes)
     return(tabela.final)
 
 }
-tabela.final<-tabela.pvalor(covariaveis.clinicas)
-```
 
-
-```{r, results='asis'}
-print(tabela.final)
-```
-
-## Modelo selecionado
-As covariáveis **constipacao, tea, dificuldade_motora e di** são significativas a um nível de 20%. 
-```{r}
-modelo<-logistf(y ~ idade_atual_anos + sexo  + tea +constipacao+ dificuldade_motora + di)
 
 
 ajuste<-function(modelo)
@@ -123,6 +100,31 @@ ajuste<-function(modelo)
   cat("\n")
 }
 
+```
+
+## Verduras e Legumes
+
+```{r}
+y<-adeq_porcoes_dia_verduras_legumes=="I" # inadequação
+table(y)
+```
+19 eventos do desfecho.
+
+```{r, warning=FALSE}
+t(summary(analise2.new[,c(2:13,15)]))
+tabela.final<-tabela.pvalor(covariaveis.clinicas)
+```
+
+
+```{r, results='asis'}
+print(tabela.final)
+```
+
+## Modelo selecionado
+As covariáveis **constipacao, tea, dificuldade_motora e di** são significativas a um nível de 20%. 
+```{r}
+modelo<-logistf(y ~ idade_atual_anos + sexo  + tea +constipacao+ dificuldade_motora + di)
+
 table(y, constipacao)
 ajuste(modelo)
 ```
@@ -130,6 +132,17 @@ ajuste(modelo)
 ```{r}
 table(constipacao,di)
 fisher.test(table(constipacao,di))
+
+table(tea,di)
+fisher.test(table(tea,di))
+chisq.test(table(tea,di))
+
+table(dificuldade_motora,di)
+fisher.test(table(dificuldade_motora,di))
+
+table(dificuldade_motora,tea)
+fisher.test(table(dificuldade_motora,tea))
+
 
 table(y, di)
 table(y, dificuldade_motora)
@@ -158,9 +171,96 @@ ajuste(modelo)
 ```{r}
 modelo<-logistf(y ~ idade_atual_anos + sexo  + tea + di  )
 ajuste(modelo)
+summary(modelo)
 
+modelo<-logistf(y ~ idade_atual_anos  + tea + di  )
+ajuste(modelo)
 summary(modelo)
 ```
+
+# Diagnóstico
+## Observações influentes
+```{r}
+# Modelo original
+fit <- logistf(y ~ idade_atual_anos  + tea + di +sexo, data=analise2.new)
+n <- nrow(analise2.new)
+DFBETAS <- matrix(NA, nrow = n, ncol = length(coef(fit)))
+se_total <- sqrt(diag(vcov(fit)))
+for(i in 1:n) {
+  fit_del<-logistf(adeq_porcoes_dia_verduras_legumes ~ idade_atual_anos  + tea + di +sexo,data=analise2.new[-i,])
+  se<- sqrt(diag(vcov(fit_del)))
+
+  DFBETAS[i,] <- (coef(fit_del) - coef(fit))/se
+}
+
+par(mfrow=c(1,4))
+# Plotar a diferença para o coeficiente de x1
+plot(DFBETAS[,2], main = "Influência por Observação (idade)", 
+     ylab = "Mudança no Coeficiente", xlab = "Índice da Observação", ylim=c(-1,1), pch=19)
+abline(h = 2/sqrt(n), col = "red")
+abline(h = -2/sqrt(n), col = "red")
+
+plot(DFBETAS[,3], main = "Influência por Observação (tea)", 
+     ylab = "Mudança no Coeficiente", xlab = "Índice da Observação", ylim=c(-1,1), pch=19)
+abline(h = 2/sqrt(n), col = "red")
+abline(h = -2/sqrt(n), col = "red")
+
+
+plot(DFBETAS[,4], main = "Influência por Observação (di)", 
+     ylab = "Mudança no Coeficiente", xlab = "Índice da Observação", ylim=c(-1,1), pch=19)
+abline(h = 2/sqrt(n), col = "red")
+abline(h = -2/sqrt(n), col = "red")
+plot(DFBETAS[,5], main = "Influência por Observação (sexo)", 
+     ylab = "Mudança no Coeficiente", xlab = "Índice da Observação", ylim=c(-1,1), pch=19)
+abline(h = 2/sqrt(n), col = "red")
+abline(h = -2/sqrt(n), col = "red")
+
+which((DFBETAS[,2]>2/sqrt(n)) | (DFBETAS[,2]<(-2/sqrt(n))))
+which((DFBETAS[,3]>2/sqrt(n)) | (DFBETAS[,3]<(-2/sqrt(n))))
+which((DFBETAS[,4]>2/sqrt(n)) | (DFBETAS[,4]<(-2/sqrt(n))))
+which((DFBETAS[,5]>2/sqrt(n)) | (DFBETAS[,5]<(-2/sqrt(n))))
+
+
+```
+
+### Indivíduo 8
+```{r}
+
+analise2.new[8,]$tea
+analise2.new[8,]$di
+analise2.new[8,]$idade_atual_anos
+summary(analise2.new[,c(2,3,14)])
+
+table(tea, di)
+
+```
+
+### Indivíduo 10
+```{r}
+
+analise2.new[10,]$tea
+analise2.new[10,]$di
+analise2.new[10,]$idade_atual_anos
+summary(analise2.new[,c(2,3,14)])
+
+table(tea, di)
+
+```
+
+
+### Indivíduo 21
+```{r}
+
+analise2.new[21,]$tea
+analise2.new[21,]$di
+analise2.new[21,]$idade_atual_anos
+summary(analise2.new[,c(2,3,14)])
+
+table(tea, di)
+
+```
+Aparentemente não há nada de estranho nas observações que foram apontadas como influentes. 
+
 A conclusão sobre o TEA é a mesma, a condição clínica TEA reduz a chance de ter um consumo inadequado de verduras. A conclusão sobre Intellectual developmental disorder também é a mesma. Porém, os coeficientes estão mais estáveis. Olhando pela razão entre o LS e o LI conseguimos ter uma noção melhor sobre a amplitude do intervalo, antes a amplitude do intervalo para a covariável di era `r 544.15/1.65 ` e para a variável tea era `r 0.66/0.008`. As covariáveis constipation e di parecem apresentar uma associação e como a constipação só apresenta um caso em uma das células achei que fizesse mais sentido manter di. 
 
 
@@ -246,6 +346,22 @@ ajuste(modelo)
 summary(modelo)
 ```
 ```{r}
+table(constipacao,y)
+
+table(constipacao, etiologia)
+fisher.test(table(constipacao, etiologia))
+
+table(constipacao, tipo_focal_generalizada)
+fisher.test(table(constipacao, tipo_focal_generalizada))
+
+table(etiologia, tipo_focal_generalizada)
+fisher.test(table(etiologia, tipo_focal_generalizada))
+
+
+```
+
+
+```{r}
 table(y, tipo_focal_generalizada)
 ```
 ```{r}
@@ -257,10 +373,68 @@ ajuste(modelo)
 
 summary(modelo)
 ```
-```{r}
-modelo<-logistf(y ~ idade_atual_anos + sexo  + tipo_focal_generalizada)
-ajuste(modelo)
-```
 
+```{r}
+modelo<-logistf(y ~  idade_atual_anos  + tipo_focal_generalizada + etiologia)
+ajuste(modelo)
+
+summary(modelo)
+```
+```{r}
+modelo<-logistf(y ~ tipo_focal_generalizada + etiologia)
+ajuste(modelo)
+
+summary(modelo)
+```
+# Diagnóstico
+## Observações influentes
+```{r}
+# Modelo original
+fit <- logistf(adeq_porcoes_dia_doces_salgadinhos_guloseimas ~ idade_atual_anos +sexo + etiologia + tipo_focal_generalizada, data=analise2.new)
+n <- nrow(analise2.new)
+DFBETAS <- matrix(NA, nrow = n, ncol = length(coef(fit)))
+for(i in 1:n) {
+  fit_del<-logistf(adeq_porcoes_dia_doces_salgadinhos_guloseimas ~idade_atual_anos +sexo + etiologia + tipo_focal_generalizada,data=analise2.new[-i,])
+  se<- sqrt(diag(vcov(fit_del)))
+
+  DFBETAS[i,] <- (coef(fit_del) - coef(fit))/se
+}
+
+par(mfrow=c(1,5))
+# Plotar a diferença para o coeficiente de x1
+plot(DFBETAS[,2], main = "Influência por Observação (idade)", 
+     ylab = "Mudança no Coeficiente", xlab = "Índice da Observação", ylim=c(-1,1), pch=19)
+abline(h = 2/sqrt(n), col = "red")
+abline(h = -2/sqrt(n), col = "red")
+
+plot(DFBETAS[,3], main = "Influência por Observação (sexo)", 
+     ylab = "Mudança no Coeficiente", xlab = "Índice da Observação", ylim=c(-1,1), pch=19)
+abline(h = 2/sqrt(n), col = "red")
+abline(h = -2/sqrt(n), col = "red")
+
+
+plot(DFBETAS[,4], main = "Influência por Observação (etiologia G)", 
+     ylab = "Mudança no Coeficiente", xlab = "Índice da Observação", ylim=c(-1,1), pch=19)
+abline(h = 2/sqrt(n), col = "red")
+abline(h = -2/sqrt(n), col = "red")
+plot(DFBETAS[,5], main = "Influência por Observação (etiologia I)", 
+     ylab = "Mudança no Coeficiente", xlab = "Índice da Observação", ylim=c(-1,1), pch=19)
+abline(h = 2/sqrt(n), col = "red")
+abline(h = -2/sqrt(n), col = "red")
+
+plot(DFBETAS[,6], main = "Influência por Observação (Epilepsia Generalizada)", 
+     ylab = "Mudança no Coeficiente", xlab = "Índice da Observação", ylim=c(-1,1), pch=19)
+abline(h = 2/sqrt(n), col = "red")
+abline(h = -2/sqrt(n), col = "red")
+
+which((DFBETAS[,2]>2/sqrt(n)) | (DFBETAS[,2]<(-2/sqrt(n))))
+which((DFBETAS[,3]>2/sqrt(n)) | (DFBETAS[,3]<(-2/sqrt(n))))
+which((DFBETAS[,4]>2/sqrt(n)) | (DFBETAS[,4]<(-2/sqrt(n))))
+which((DFBETAS[,5]>2/sqrt(n)) | (DFBETAS[,5]<(-2/sqrt(n))))
+which((DFBETAS[,6]>2/sqrt(n)) | (DFBETAS[,6]<(-2/sqrt(n))))
+
+
+
+```
 
 
