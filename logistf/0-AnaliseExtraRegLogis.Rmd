@@ -1,5 +1,5 @@
 ---
-title: "0-AnalisesRegLogis"
+title: "0-Analises Regressão Logística"
 author: "Jaqueline Lamas da Silva"
 date: "2026-05-19"
 output:

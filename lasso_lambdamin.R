@@ -64,7 +64,7 @@ boot_lasso<-function(grupo_ali)
   
   set.seed(123)
   
-  B <- 500
+  B <- 2000
   
   formula_lasso <-  grupo_ali ~ idade_atual_anos + sexo + idade_1a_crise_meses +
     tea + di + tdah + dificuldade_motora + 
@@ -116,3 +116,6 @@ boot_lasso<-function(grupo_ali)
 boot_lasso(analise2.new$soma_porcoes_dia_verduras_legumes)
 
 boot_lasso(analise2.new$soma_porcoes_dia_laticinios)
+
+
+boot_lasso(analise2.new$soma_porcoes_dia_frutas)
